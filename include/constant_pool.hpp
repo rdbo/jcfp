@@ -1,8 +1,8 @@
 #ifndef _JCFP_CONSTANT_POOL_HPP_
 #define _JCFP_CONSTANT_POOL_HPP_
 
-#include "basetypes.hpp"
 #include <vector>
+#include "basetypes.hpp"
 
 namespace jcfp {
 	class ConstantPoolEntry {
@@ -124,10 +124,35 @@ namespace jcfp {
 			CONSTANT_MethodHandle_info method_handle_info;
 			CONSTANT_InvokeDynamic_info invoke_dynamic_info;
 		};
+	public:
+		ConstantPoolEntry() : tag(Tag::NullEntry) {}
+		ConstantPoolEntry(CONSTANT_Class_info info) : tag(Tag::CONSTANT_Class), class_info(info) {}
+
+		ConstantPoolEntry(CONSTANT_Fieldref_info info) : tag(Tag::CONSTANT_Fieldref), fieldref_info(info) {}
+		ConstantPoolEntry(CONSTANT_Methodref_info info) : tag(Tag::CONSTANT_Methodref), methodref_info(info) {}
+		ConstantPoolEntry(CONSTANT_InterfaceMethodref_info info) : tag(Tag::CONSTANT_InterfaceMethodref), interface_methodref_info(info) {}
+
+		ConstantPoolEntry(CONSTANT_String_info info) : tag(Tag::CONSTANT_String), string_info(info) {}
+		ConstantPoolEntry(CONSTANT_Integer_info info) : tag(Tag::CONSTANT_Integer), integer_info(info) {}
+		ConstantPoolEntry(CONSTANT_Float_info info) : tag(Tag::CONSTANT_Float), float_info(info) {}
+
+		ConstantPoolEntry(CONSTANT_Long_info info) : tag(Tag::CONSTANT_Long), long_info(info) {}
+		ConstantPoolEntry(CONSTANT_Double_info info) : tag(Tag::CONSTANT_Double), double_info(info) {}
+
+		ConstantPoolEntry(CONSTANT_NameAndType_info info) : tag(Tag::CONSTANT_NameAndType), name_and_type_info(info) {}
+		ConstantPoolEntry(CONSTANT_Utf8_info info) : tag(Tag::CONSTANT_Utf8), utf8_info(info) {}
+		ConstantPoolEntry(CONSTANT_MethodHandle_info info) : tag(Tag::CONSTANT_MethodHandle), method_handle_info(info) {}
+		ConstantPoolEntry(CONSTANT_InvokeDynamic_info info) : tag(Tag::CONSTANT_InvokeDynamic), invoke_dynamic_info(info) {}
+	public:
+		bool is_wide_entry()
+		{
+			return tag == Tag::CONSTANT_Double || tag == Tag::CONSTANT_Long;
+		}
 	};
 
 	class ConstantPool {
-	public:
+	private:
+		/* Modifying the entries directly could cause issues, use the helper functions */
 		std::vector<ConstantPoolEntry> entries;
 
 	public:
@@ -139,9 +164,39 @@ namespace jcfp {
 		 * Which means that `constant_pool_count = total_entries + 1`
 		 * This information is required for writing the ClassFile back
 		 * into bytes
+		 *
+		 * Iteration goes from 1 to count - 1
 		 */
 		inline u2 count() {
 			return entries.size() + 1;
+		}
+
+		/* Helper functions */
+		inline ConstantPoolEntry::Tag get_tag(u2 index) {
+			return entries[index].tag;
+		}
+
+		inline ConstantPoolEntry get_entry(u2 index) {
+			return entries[index];
+		}
+
+		inline void push_entry(ConstantPoolEntry entry) {
+			entries.push_back(entry);
+			if (entry.is_wide_entry()) {
+				entries.push_back(ConstantPoolEntry());
+			}
+		}
+
+		inline ConstantPoolEntry pop_entry() {
+			if (entries.size() > 1 && entries[entries.size() - 2].is_wide_entry()) {
+				entries.pop_back(); // Last entry is a NullEntry added due to a preceding wide entry,
+			                            // will be skipped
+			}
+
+			ConstantPoolEntry last_entry = entries.back();
+			entries.pop_back();
+
+			return last_entry;
 		}
 	};
 }
