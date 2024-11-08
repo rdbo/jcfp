@@ -9,11 +9,11 @@ namespace jcfp {
 	public:
 		enum class Tag : u1 {
 			/*
-			 * Null entries are used for:
+			 * Empty entries are used for:
 			 *   - The first index of the constant pool, which is always invalid
 			 *   - The additional unused indices of Double and Long entries
 			 */
-			NullEntry = 0,
+			Empty = 0,
 
 			/* Standard constant pool entries */
 			CONSTANT_Class              = 7,
@@ -125,7 +125,7 @@ namespace jcfp {
 			CONSTANT_InvokeDynamic_info invoke_dynamic_info;
 		};
 	public:
-		ConstantPoolEntry() : tag(Tag::NullEntry) {}
+		ConstantPoolEntry() : tag(Tag::Empty) {}
 		ConstantPoolEntry(CONSTANT_Class_info info) : tag(Tag::CONSTANT_Class), class_info(info) {}
 
 		ConstantPoolEntry(CONSTANT_Fieldref_info info) : tag(Tag::CONSTANT_Fieldref), fieldref_info(info) {}
@@ -189,7 +189,7 @@ namespace jcfp {
 
 		inline ConstantPoolEntry pop_entry() {
 			if (entries.size() > 1 && entries[entries.size() - 2].is_wide_entry()) {
-				entries.pop_back(); // Last entry is a NullEntry added due to a preceding wide entry,
+				entries.pop_back(); // Last entry is Empty added due to a preceding wide entry,
 			                            // will be skipped
 			}
 
@@ -197,6 +197,27 @@ namespace jcfp {
 			entries.pop_back();
 
 			return last_entry;
+		}
+
+		inline void insert_entry(u2 index, ConstantPoolEntry entry)
+		{
+			if (entry.is_wide_entry())
+				entries.insert(entries.begin() + index, ConstantPoolEntry());
+
+			entries.insert(entries.begin() + index, entry);
+		}
+
+		inline void remove_entry(u2 index)
+		{
+			ConstantPoolEntry entry = entries[index];
+
+			entries.erase(entries.begin() + index);
+			
+			if (index > 1 && entries[index - 1].is_wide_entry()) {
+				entries.erase(entries.begin() + (index - 1));
+			} else if (entry.is_wide_entry()) {
+				entries.erase(entries.begin() + index);
+			}
 		}
 	};
 }
