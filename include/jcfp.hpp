@@ -34,6 +34,8 @@ namespace jcfp {
 		std::vector<u2> fields;
 		std::vector<u2> methods;
 		std::vector<u2> attributes;
+	public:
+		static ClassFile parse();
 	};
 }
 
