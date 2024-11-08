@@ -18,6 +18,7 @@
 
 #include <vector>
 #include "basetypes.hpp"
+#include "error.hpp"
 
 namespace jcfp {
 	class ConstantPoolEntry {
@@ -159,6 +160,8 @@ namespace jcfp {
 		ConstantPoolEntry(CONSTANT_MethodHandle_info info) : tag(Tag::CONSTANT_MethodHandle), method_handle_info(info) {}
 		ConstantPoolEntry(CONSTANT_InvokeDynamic_info info) : tag(Tag::CONSTANT_InvokeDynamic), invoke_dynamic_info(info) {}
 	public:
+		static std::expected<ConstantPoolEntry, Error> parse(u1 *bytes, size_t maxlength = 0);
+
 		bool is_wide_entry()
 		{
 			return tag == Tag::CONSTANT_Double || tag == Tag::CONSTANT_Long;
@@ -171,6 +174,8 @@ namespace jcfp {
 		std::vector<ConstantPoolEntry> entries;
 
 	public:
+		static std::expected<ConstantPool, Error> parse(u1 *bytes, size_t maxlength = 0);
+
 		/*
 		 * The constant pool entries are defined as:
 		 *

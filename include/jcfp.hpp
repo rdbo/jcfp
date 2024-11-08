@@ -17,8 +17,10 @@
 #define _JCFP_HPP_
 
 #include <vector>
+#include <expected>
 #include "basetypes.hpp"
 #include "constant_pool.hpp"
+#include "error.hpp"
 
 namespace jcfp {
 	class ClassFile {
@@ -35,7 +37,7 @@ namespace jcfp {
 		std::vector<u2> methods;
 		std::vector<u2> attributes;
 	public:
-		static ClassFile parse();
+		static std::expected<ClassFile, Error> parse(u1 *bytes, size_t maxlength = 0);
 	};
 }
 

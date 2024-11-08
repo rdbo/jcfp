@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.20)
 
 project(jcfp CXX)
 
+set (CMAKE_CXX_STANDARD 23)
+
 option(JCFP_BUILD_TESTS "Enable JCFP test executable")
 
 set(JCFP_INCLUDE "${PROJECT_SOURCE_DIR}/include")
