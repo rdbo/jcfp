@@ -45,6 +45,36 @@ namespace jcfp {
 		ACC_ENUM         = 0x4000,
 		ACC_MODULE       = 0x8000
 	};
+
+	// This may not have all the major versions,
+	// since it would have to be updated everytime
+	// Java has a major version as well
+	enum class MajorVersion : u2 {
+		JAVA_SE_1_0_2 = 45,
+		JAVA_SE_1_1   = 45,
+		JAVA_SE_1_2   = 46,
+		JAVA_SE_1_3   = 47,
+		JAVA_SE_1_4   = 48,
+		JAVA_SE_5_0   = 49,
+		JAVA_SE_6     = 50,
+		JAVA_SE_7     = 51,
+		JAVA_SE_8     = 52,
+		JAVA_SE_9     = 53,
+		JAVA_SE_10    = 54,
+		JAVA_SE_11    = 55,
+		JAVA_SE_12    = 56,
+		JAVA_SE_13    = 57,
+		JAVA_SE_14    = 58,
+		JAVA_SE_15    = 59,
+		JAVA_SE_16    = 60,
+		JAVA_SE_17    = 61,
+		JAVA_SE_18    = 62,
+		JAVA_SE_19    = 63,
+		JAVA_SE_20    = 64,
+		JAVA_SE_21    = 65,
+		JAVA_SE_22    = 66,
+		JAVA_SE_23    = 67,
+	};
 }
 
 #endif

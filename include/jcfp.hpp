@@ -27,7 +27,7 @@ namespace jcfp {
 	public:
 		u4 magic;
 		u2 minor_version;
-		u2 major_version;
+		MajorVersion major_version;
 		ConstantPool constant_pool;
 		AccessFlags access_flags;
 		u2 this_class;
@@ -39,7 +39,7 @@ namespace jcfp {
 	public:
 		ClassFile(u4 magic,
 			  u2 minor_version,
-			  u2 major_version,
+			  MajorVersion major_version,
 			  ConstantPool constant_pool,
 			  AccessFlags access_flags,
 			  u2 this_class,

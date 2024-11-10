@@ -24,7 +24,7 @@ std::expected<ClassFile, Error> ClassFile::parse(u1 *bytes)
 {
 	u4 magic;
 	u2 minor_version;
-	u2 major_version;
+	MajorVersion major_version;
 	ConstantPool constant_pool;
 	AccessFlags access_flags;
 	u2 this_class;
@@ -33,10 +33,18 @@ std::expected<ClassFile, Error> ClassFile::parse(u1 *bytes)
 	std::vector<u2> fields;
 	std::vector<u2> methods;
 	std::vector<u2> attributes;
+	size_t offset = 0;
 
-	magic = from_big_endian(*(u4 *)bytes);
+	magic = from_big_endian(*(u4 *)(&bytes[offset]));
 	if (magic != CLASSFILE_MAGIC)
-		return std::unexpected(Error::WrongMagic);
+		return std::unexpected(Error { ErrorKind::WrongMagic, offset });
+	offset += sizeof(magic);
+
+	minor_version = from_big_endian(*(u2 *)(&bytes[offset]));
+	offset += sizeof(minor_version);
+
+	major_version = static_cast<MajorVersion>(from_big_endian(*(u2 *)(&bytes[offset])));
+	offset += sizeof(major_version);
 
 	return ClassFile(magic, minor_version, major_version, constant_pool,
 	                 access_flags, this_class, super_class, interfaces,

@@ -16,12 +16,14 @@ int main()
 
 	auto result = ClassFile::parse(buf);
 	if (!result.has_value()) {
-		std::cerr << "Failed to parse ClassFile: " << static_cast<int>(result.error()) << std::endl;
+		std::cerr << "Failed to parse ClassFile: " << static_cast<int>(result.error().kind) << std::endl;
 		return -1;
 	}
 
 	ClassFile cf = result.value();
 	std::cout << "CF magic: " << std::hex << cf.magic << std::dec << std::endl;
+	std::cout << "CF minor: " << cf.minor_version << std::dec << std::endl;
+	std::cout << "CF major: " << static_cast<u2>(cf.major_version) << std::dec << std::endl;
 
 	return 0;
 }
