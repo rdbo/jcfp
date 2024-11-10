@@ -160,7 +160,7 @@ namespace jcfp {
 		ConstantPoolEntry(CONSTANT_MethodHandle_info info) : tag(Tag::CONSTANT_MethodHandle), method_handle_info(info) {}
 		ConstantPoolEntry(CONSTANT_InvokeDynamic_info info) : tag(Tag::CONSTANT_InvokeDynamic), invoke_dynamic_info(info) {}
 	public:
-		static std::expected<ConstantPoolEntry, Error> parse(u1 *bytes, size_t maxlength = 0);
+		static std::expected<ConstantPoolEntry, Error> parse(u1 *bytes);
 
 		bool is_wide_entry()
 		{
@@ -174,7 +174,7 @@ namespace jcfp {
 		std::vector<ConstantPoolEntry> entries;
 
 	public:
-		static std::expected<ConstantPool, Error> parse(u1 *bytes, size_t maxlength = 0);
+		static std::expected<ConstantPool, Error> parse(u1 *bytes);
 
 		/*
 		 * The constant pool entries are defined as:

@@ -37,7 +37,24 @@ namespace jcfp {
 		std::vector<u2> methods;
 		std::vector<u2> attributes;
 	public:
-		static std::expected<ClassFile, Error> parse(u1 *bytes, size_t maxlength = 0);
+		ClassFile(u4 magic,
+			  u2 minor_version,
+			  u2 major_version,
+			  ConstantPool constant_pool,
+			  AccessFlags access_flags,
+			  u2 this_class,
+			  u2 super_class,
+			  std::vector<u2> interfaces,
+			  std::vector<u2> fields,
+			  std::vector<u2> methods,
+			  std::vector<u2> attributes)
+		: magic(magic), minor_version(minor_version), major_version(major_version),
+		  constant_pool(constant_pool), access_flags(access_flags), this_class(this_class),
+		  super_class(super_class), interfaces(interfaces), fields(fields), methods(methods),
+		  attributes(attributes)
+		{}
+	public:
+		static std::expected<ClassFile, Error> parse(u1 *bytes);
 	};
 }
 

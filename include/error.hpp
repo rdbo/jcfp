@@ -3,8 +3,8 @@
 
 namespace jcfp {
 	enum class Error {
+		Unknown,
 		WrongMagic, /* The ClassFile's `magic` is wrong  */
-		NotEnoughBytes, /* When `maxlength` is too short to parse something */
 	};
 }
 
