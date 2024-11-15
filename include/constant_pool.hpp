@@ -23,7 +23,7 @@
 namespace jcfp {
 	class ConstantPoolEntry {
 	public:
-		enum class Tag : u1 {
+		enum Tag : u1 {
 			/*
 			 * Empty entries are used for:
 			 *   - The first index of the constant pool, which is always invalid
@@ -162,7 +162,7 @@ namespace jcfp {
 	public:
 		static std::expected<ConstantPoolEntry, Error> parse(u1 *bytes);
 
-		bool is_wide_entry()
+		inline bool is_wide_entry()
 		{
 			return tag == Tag::CONSTANT_Double || tag == Tag::CONSTANT_Long;
 		}

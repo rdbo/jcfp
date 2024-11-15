@@ -49,7 +49,7 @@ namespace jcfp {
 	// This may not have all the major versions,
 	// since it would have to be updated everytime
 	// Java has a major version as well
-	enum class MajorVersion : u2 {
+	enum MajorVersion : u2 {
 		JAVA_SE_1_0_2 = 45,
 		JAVA_SE_1_1   = 45,
 		JAVA_SE_1_2   = 46,
