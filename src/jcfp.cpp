@@ -33,18 +33,15 @@ std::expected<ClassFile, Error> ClassFile::parse(u1 *bytes)
 	std::vector<u2> fields;
 	std::vector<u2> methods;
 	std::vector<u2> attributes;
-	size_t offset = 0;
 
-	magic = from_big_endian(*(u4 *)(&bytes[offset]));
-	if (magic != CLASSFILE_MAGIC)
-		return std::unexpected(Error { ErrorKind::WrongMagic, offset });
-	offset += sizeof(magic);
+	BufReader reader = BufReader(bytes);
 
-	minor_version = from_big_endian(*(u2 *)(&bytes[offset]));
-	offset += sizeof(minor_version);
+	magic = reader.read_be<u4>();
+	if (magic == CLASSFILE_MAGIC)
+		return std::unexpected(Error { ErrorKind::WrongMagic, reader.prev_pos() });
 
-	major_version = static_cast<MajorVersion>(from_big_endian(*(u2 *)(&bytes[offset])));
-	offset += sizeof(major_version);
+	minor_version = reader.read_be<u2>();
+	major_version = static_cast<MajorVersion>(reader.read_be<u2>());
 
 	return ClassFile(magic, minor_version, major_version, constant_pool,
 	                 access_flags, this_class, super_class, interfaces,

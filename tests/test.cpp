@@ -16,7 +16,7 @@ int main()
 
 	auto result = ClassFile::parse(buf);
 	if (!result.has_value()) {
-		std::cerr << "Failed to parse ClassFile: " << static_cast<int>(result.error().kind) << std::endl;
+		std::cerr << "Failed to parse ClassFile: " << static_cast<int>(result.error().kind) << " @ " << result.error().offset << std::endl;
 		return -1;
 	}
 
