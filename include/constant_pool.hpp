@@ -17,6 +17,8 @@
 #define _JCFP_CONSTANT_POOL_HPP_
 
 #include <vector>
+#include <variant>
+#include <string>
 #include "basetypes.hpp"
 #include "error.hpp"
 
@@ -102,8 +104,9 @@ namespace jcfp {
 		} CONSTANT_NameAndType_info;
 
 		typedef struct {
-			u2 length;
-			u1 bytes[];
+			// u2 length;
+			// u1 bytes[];
+			std::string bytes;
 		} CONSTANT_Utf8_info;
 
 		typedef struct {
@@ -121,46 +124,52 @@ namespace jcfp {
 		} CONSTANT_InvokeDynamic_info;
 	public:
 		Tag tag;
-		union {
-			CONSTANT_Class_info class_info;
+		std::variant<
+			CONSTANT_Class_info,
 
-			CONSTANT_Fieldref_info fieldref_info;
-			CONSTANT_Methodref_info methodref_info;
-			CONSTANT_InterfaceMethodref_info interface_methodref_info;
+			CONSTANT_Fieldref_info,
+			CONSTANT_Methodref_info,
+			CONSTANT_InterfaceMethodref_info,
 
-			CONSTANT_String_info string_info;
-			CONSTANT_Integer_info integer_info;
-			CONSTANT_Float_info float_info;
+			CONSTANT_String_info,
+			CONSTANT_Integer_info,
+			CONSTANT_Float_info,
 
-			CONSTANT_Long_info long_info;
-			CONSTANT_Double_info double_info;
+			CONSTANT_Long_info,
+			CONSTANT_Double_info,
 
-			CONSTANT_NameAndType_info name_and_type_info;
-			CONSTANT_Utf8_info utf8_info;
-			CONSTANT_MethodHandle_info method_handle_info;
-			CONSTANT_InvokeDynamic_info invoke_dynamic_info;
-		};
+			CONSTANT_NameAndType_info,
+			CONSTANT_Utf8_info,
+			CONSTANT_MethodHandle_info,
+			CONSTANT_InvokeDynamic_info
+		> info;
 	public:
 		ConstantPoolEntry() : tag(Tag::Empty) {}
-		ConstantPoolEntry(CONSTANT_Class_info info) : tag(Tag::CONSTANT_Class), class_info(info) {}
+		ConstantPoolEntry(CONSTANT_Class_info info) : tag(Tag::CONSTANT_Class), info(info) {}
 
-		ConstantPoolEntry(CONSTANT_Fieldref_info info) : tag(Tag::CONSTANT_Fieldref), fieldref_info(info) {}
-		ConstantPoolEntry(CONSTANT_Methodref_info info) : tag(Tag::CONSTANT_Methodref), methodref_info(info) {}
-		ConstantPoolEntry(CONSTANT_InterfaceMethodref_info info) : tag(Tag::CONSTANT_InterfaceMethodref), interface_methodref_info(info) {}
+		ConstantPoolEntry(CONSTANT_Fieldref_info info) : tag(Tag::CONSTANT_Fieldref), info(info) {}
+		ConstantPoolEntry(CONSTANT_Methodref_info info) : tag(Tag::CONSTANT_Methodref), info(info) {}
+		ConstantPoolEntry(CONSTANT_InterfaceMethodref_info info) : tag(Tag::CONSTANT_InterfaceMethodref), info(info) {}
 
-		ConstantPoolEntry(CONSTANT_String_info info) : tag(Tag::CONSTANT_String), string_info(info) {}
-		ConstantPoolEntry(CONSTANT_Integer_info info) : tag(Tag::CONSTANT_Integer), integer_info(info) {}
-		ConstantPoolEntry(CONSTANT_Float_info info) : tag(Tag::CONSTANT_Float), float_info(info) {}
+		ConstantPoolEntry(CONSTANT_String_info info) : tag(Tag::CONSTANT_String), info(info) {}
+		ConstantPoolEntry(CONSTANT_Integer_info info) : tag(Tag::CONSTANT_Integer), info(info) {}
+		ConstantPoolEntry(CONSTANT_Float_info info) : tag(Tag::CONSTANT_Float), info(info) {}
 
-		ConstantPoolEntry(CONSTANT_Long_info info) : tag(Tag::CONSTANT_Long), long_info(info) {}
-		ConstantPoolEntry(CONSTANT_Double_info info) : tag(Tag::CONSTANT_Double), double_info(info) {}
+		ConstantPoolEntry(CONSTANT_Long_info info) : tag(Tag::CONSTANT_Long), info(info) {}
+		ConstantPoolEntry(CONSTANT_Double_info info) : tag(Tag::CONSTANT_Double), info(info) {}
 
-		ConstantPoolEntry(CONSTANT_NameAndType_info info) : tag(Tag::CONSTANT_NameAndType), name_and_type_info(info) {}
-		ConstantPoolEntry(CONSTANT_Utf8_info info) : tag(Tag::CONSTANT_Utf8), utf8_info(info) {}
-		ConstantPoolEntry(CONSTANT_MethodHandle_info info) : tag(Tag::CONSTANT_MethodHandle), method_handle_info(info) {}
-		ConstantPoolEntry(CONSTANT_InvokeDynamic_info info) : tag(Tag::CONSTANT_InvokeDynamic), invoke_dynamic_info(info) {}
+		ConstantPoolEntry(CONSTANT_NameAndType_info info) : tag(Tag::CONSTANT_NameAndType), info(info) {}
+		ConstantPoolEntry(CONSTANT_Utf8_info info) : tag(Tag::CONSTANT_Utf8), info(info) {}
+		ConstantPoolEntry(CONSTANT_MethodHandle_info info) : tag(Tag::CONSTANT_MethodHandle), info(info) {}
+		ConstantPoolEntry(CONSTANT_InvokeDynamic_info info) : tag(Tag::CONSTANT_InvokeDynamic), info(info) {}
 	public:
 		static std::expected<ConstantPoolEntry, Error> parse(u1 *bytes);
+
+		template <typename T>
+		inline T get()
+		{
+			return std::get<T>(this->info);
+		}
 
 		inline bool is_wide_entry()
 		{
@@ -172,7 +181,9 @@ namespace jcfp {
 	private:
 		/* Modifying the entries directly could cause issues, use the helper functions */
 		std::vector<ConstantPoolEntry> entries;
-
+	public:
+		ConstantPool() {}
+		ConstantPool(std::vector<ConstantPoolEntry> entries) : entries(entries) {}
 	public:
 		static std::expected<ConstantPool, Error> parse(u1 *bytes);
 
