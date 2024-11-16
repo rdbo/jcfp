@@ -25,5 +25,10 @@ int main()
 	std::cout << "CF minor: " << cf.minor_version << std::dec << std::endl;
 	std::cout << "CF major: " << static_cast<u2>(cf.major_version) << std::dec << std::endl;
 
+	std::cout << "constant pool count: " << cf.constant_pool.count() << std::endl;
+	for (auto &cpi : cf.constant_pool.get_entries()) {
+		std::cout << "TAG: " << static_cast<u2>(cpi.tag) << std::endl;
+	}
+
 	return 0;
 }

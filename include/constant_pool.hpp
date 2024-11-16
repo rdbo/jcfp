@@ -50,6 +50,8 @@ namespace jcfp {
 			CONSTANT_InvokeDynamic      = 18,
 		};
 
+		typedef struct {} Empty_info;
+
 		typedef struct {
 			u2 name_index;
 		} CONSTANT_Class_info;
@@ -124,6 +126,8 @@ namespace jcfp {
 		} CONSTANT_InvokeDynamic_info;
 	public:
 		using EntryVariant = std::variant<
+			Empty_info,
+
 			CONSTANT_Class_info,
 
 			CONSTANT_Fieldref_info,
@@ -140,6 +144,7 @@ namespace jcfp {
 			CONSTANT_NameAndType_info,
 			CONSTANT_Utf8_info,
 			CONSTANT_MethodHandle_info,
+			CONSTANT_MethodType_info,
 			CONSTANT_InvokeDynamic_info
 		>;
 		Tag tag;
@@ -148,6 +153,8 @@ namespace jcfp {
 		ConstantPoolEntry() : tag(Tag::Empty) {}
 		ConstantPoolEntry(EntryVariant info) : info(info) {
 			Tag tag_table[] = {
+				Tag::Empty,
+
 				Tag::CONSTANT_Class,
 
 				Tag::CONSTANT_Fieldref,
@@ -234,6 +241,10 @@ namespace jcfp {
 
 		inline ConstantPoolEntry get_entry(u2 index) {
 			return entries[index];
+		}
+
+		inline std::vector<ConstantPoolEntry> &get_entries() {
+			return this->entries;
 		}
 
 		inline void push_entry(ConstantPoolEntry entry) {

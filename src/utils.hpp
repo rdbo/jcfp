@@ -50,6 +50,18 @@ public:
 		return t;
 	}
 
+	inline std::vector<u1> read_bytes(size_t size)
+	{
+		std::vector<u1> bytes;
+
+		for (size_t i = 0; i < size; ++i) {
+			u1 byte = this->read<u1>();
+			bytes.push_back(byte);
+		}
+
+		return bytes;
+	}
+
 	inline size_t prev_pos()
 	{
 		return this->prev_offset;
@@ -61,6 +73,7 @@ public:
 	}
 };
 
-
+std::expected<ConstantPool, Error> parse_constant_pool(BufReader &reader);
+std::expected<ConstantPoolEntry, Error> parse_constant_pool_entry(BufReader &reader);
 
 #endif

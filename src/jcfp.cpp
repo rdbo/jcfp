@@ -43,6 +43,11 @@ std::expected<ClassFile, Error> ClassFile::parse(u1 *bytes)
 	minor_version = reader.read_be<u2>();
 	major_version = static_cast<MajorVersion>(reader.read_be<u2>());
 
+	auto result = parse_constant_pool(reader);
+	if (!result.has_value())
+		return std::unexpected(result.error());
+	constant_pool = result.value();
+
 	return ClassFile(magic, minor_version, major_version, constant_pool,
 	                 access_flags, this_class, super_class, interfaces,
 	                 fields, methods, attributes);
