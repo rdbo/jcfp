@@ -61,21 +61,6 @@ public:
 	}
 };
 
-inline void from_big_endian(u1 *from, u1 *to, size_t size)
-{
-	for (size_t i = 0; i < size; ++i) {
-		to[i] = from[size - 1 - i];
-	}
-}
 
-template <typename T>
-inline T from_big_endian(T &buf)
-{
-	T result;
-
-	from_big_endian(reinterpret_cast<u1 *>(&buf), reinterpret_cast<u1 *>(&result), sizeof(T));
-
-	return result;
-}
 
 #endif

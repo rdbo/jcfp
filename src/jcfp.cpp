@@ -37,7 +37,7 @@ std::expected<ClassFile, Error> ClassFile::parse(u1 *bytes)
 	BufReader reader = BufReader(bytes);
 
 	magic = reader.read_be<u4>();
-	if (magic == CLASSFILE_MAGIC)
+	if (magic != CLASSFILE_MAGIC)
 		return std::unexpected(Error { ErrorKind::WrongMagic, reader.prev_pos() });
 
 	minor_version = reader.read_be<u2>();

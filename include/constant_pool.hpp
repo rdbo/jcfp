@@ -123,8 +123,7 @@ namespace jcfp {
 			u2 name_and_type_index;
 		} CONSTANT_InvokeDynamic_info;
 	public:
-		Tag tag;
-		std::variant<
+		using EntryVariant = std::variant<
 			CONSTANT_Class_info,
 
 			CONSTANT_Fieldref_info,
@@ -142,9 +141,35 @@ namespace jcfp {
 			CONSTANT_Utf8_info,
 			CONSTANT_MethodHandle_info,
 			CONSTANT_InvokeDynamic_info
-		> info;
+		>;
+		Tag tag;
+		EntryVariant info;
 	public:
 		ConstantPoolEntry() : tag(Tag::Empty) {}
+		ConstantPoolEntry(EntryVariant info) : info(info) {
+			Tag tag_table[] = {
+				Tag::CONSTANT_Class,
+
+				Tag::CONSTANT_Fieldref,
+				Tag::CONSTANT_Methodref,
+				Tag::CONSTANT_InterfaceMethodref,
+
+				Tag::CONSTANT_String,
+				Tag::CONSTANT_Integer,
+				Tag::CONSTANT_Float,
+
+				Tag::CONSTANT_Long,
+				Tag::CONSTANT_Double,
+
+				Tag::CONSTANT_NameAndType,
+				Tag::CONSTANT_Utf8,
+				Tag::CONSTANT_MethodHandle,
+				Tag::CONSTANT_InvokeDynamic
+			};
+
+			this->tag = tag_table[info.index()];
+		}
+
 		ConstantPoolEntry(CONSTANT_Class_info info) : tag(Tag::CONSTANT_Class), info(info) {}
 
 		ConstantPoolEntry(CONSTANT_Fieldref_info info) : tag(Tag::CONSTANT_Fieldref), info(info) {}

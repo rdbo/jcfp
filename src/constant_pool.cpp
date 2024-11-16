@@ -22,6 +22,7 @@ std::expected<ConstantPoolEntry, Error> ConstantPoolEntry::parse(u1 *bytes)
 {
 	BufReader reader = BufReader(bytes);
 	u1 tag = reader.read<u1>();
+	EntryVariant info;
 
 	switch (tag) {
 	case Tag::CONSTANT_Class:
