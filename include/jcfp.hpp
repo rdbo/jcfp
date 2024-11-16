@@ -28,7 +28,7 @@ namespace jcfp {
 		// u4 attribute_length;
 		// u1 info[attribute_length];
 		std::vector<u1> info;
-	} attribute_info;
+	} AttributeInfo;
 
 	typedef struct {
 		u2 access_flags;
@@ -36,8 +36,8 @@ namespace jcfp {
 		u2 descriptor_index;
 		// u2 attributes_count;
 		// attribute_info attributes[attributes_count];
-		std::vector<attribute_info> attributes;
-	} field_info;
+		std::vector<AttributeInfo> attributes;
+	} FieldInfo;
 
 	typedef struct {
 		u2 access_flags;
@@ -45,8 +45,8 @@ namespace jcfp {
 		u2 descriptor_index;
 		// u2 attributes_count;
 		// attribute_info attributes[attributes_count];
-		std::vector<attribute_info> attributes;
-	} method_info;
+		std::vector<AttributeInfo> attributes;
+	} MethodInfo;
 
 	class ClassFile {
 	public:
@@ -64,13 +64,13 @@ namespace jcfp {
 		std::vector<u2> interfaces;
 		// u2 fields_count;
 		// field_info fields[fields_count];
-		std::vector<field_info> fields;
+		std::vector<FieldInfo> fields;
 		// u2 methods_count;
 		// method_info methods[methods_count];
-		std::vector<method_info> methods;
+		std::vector<MethodInfo> methods;
 		// u2 attributes_count;
 		// attribute_info attributes[attributes_count];
-		std::vector<attribute_info> attributes;
+		std::vector<AttributeInfo> attributes;
 	public:
 		ClassFile(u4 magic,
 			  u2 minor_version,
@@ -80,9 +80,9 @@ namespace jcfp {
 			  u2 this_class,
 			  u2 super_class,
 			  std::vector<u2> interfaces,
-			  std::vector<field_info> fields,
-			  std::vector<method_info> methods,
-			  std::vector<attribute_info> attributes)
+			  std::vector<FieldInfo> fields,
+			  std::vector<MethodInfo> methods,
+			  std::vector<AttributeInfo> attributes)
 		: magic(magic), minor_version(minor_version), major_version(major_version),
 		  constant_pool(constant_pool), access_flags(access_flags), this_class(this_class),
 		  super_class(super_class), interfaces(interfaces), fields(fields), methods(methods),

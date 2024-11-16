@@ -34,27 +34,27 @@ namespace jcfp {
 			Empty = 0,
 
 			/* Standard constant pool entries */
-			CONSTANT_Class              = 7,
-			CONSTANT_Fieldref           = 9,
-			CONSTANT_Methodref          = 10,
-			CONSTANT_InterfaceMethodref = 11,
-			CONSTANT_String             = 8,
-			CONSTANT_Integer            = 3,
-			CONSTANT_Float              = 4,
-			CONSTANT_Long               = 5,
-			CONSTANT_Double             = 6,
-			CONSTANT_NameAndType        = 12,
-			CONSTANT_Utf8               = 1,
-			CONSTANT_MethodHandle       = 15,
-			CONSTANT_MethodType         = 16,
-			CONSTANT_InvokeDynamic      = 18,
+			Class              = 7,
+			Fieldref           = 9,
+			Methodref          = 10,
+			InterfaceMethodref = 11,
+			String             = 8,
+			Integer            = 3,
+			Float              = 4,
+			Long               = 5,
+			Double             = 6,
+			NameAndType        = 12,
+			Utf8               = 1,
+			MethodHandle       = 15,
+			MethodType         = 16,
+			InvokeDynamic      = 18,
 		};
 
-		typedef struct {} Empty_info;
+		typedef struct {} EmptyInfo;
 
 		typedef struct {
 			u2 name_index;
-		} CONSTANT_Class_info;
+		} ClassInfo;
 
 		/*
 		 * NOTE: Even though Fieldref, Methodref and InterfaceMethodref
@@ -66,86 +66,86 @@ namespace jcfp {
 		typedef struct {
 			u2 class_index;
 			u2 name_and_type_index;
-		} CONSTANT_Fieldref_info;
+		} FieldrefInfo;
 
 		typedef struct {
 			u2 class_index;
 			u2 name_and_type_index;
-		} CONSTANT_Methodref_info;
+		} MethodrefInfo;
 
 		typedef struct {
 			u2 class_index;
 			u2 name_and_type_index;
-		} CONSTANT_InterfaceMethodref_info;
+		} InterfaceMethodrefInfo;
 
 		typedef struct {
 			u2 string_index;
-		} CONSTANT_String_info;
+		} StringInfo;
 
 		typedef struct {
 			u4 bytes;
-		} CONSTANT_Integer_info;
+		} IntegerInfo;
 
 		typedef struct {
 			u4 bytes;
-		} CONSTANT_Float_info;
+		} FloatInfo;
 
 		typedef struct {
 			u4 high_bytes;
 			u4 low_bytes;
-		} CONSTANT_Long_info;
+		} LongInfo;
 
 		typedef struct {
 			u4 high_bytes;
 			u4 low_bytes;
-		} CONSTANT_Double_info;
+		} DoubleInfo;
 
 		typedef struct {
 			u2 name_index;
 			u2 descriptor_index;
-		} CONSTANT_NameAndType_info;
+		} NameAndTypeInfo;
 
 		typedef struct {
 			// u2 length;
 			// u1 bytes[];
 			std::string bytes;
-		} CONSTANT_Utf8_info;
+		} Utf8Info;
 
 		typedef struct {
 			u1 reference_kind;
 			u2 reference_index;
-		} CONSTANT_MethodHandle_info;
+		} MethodHandleInfo;
 
 		typedef struct {
 			u2 descriptor_index;
-		} CONSTANT_MethodType_info;
+		} MethodTypeInfo;
 
 		typedef struct {
 			u2 bootstrap_method_attr_index;
 			u2 name_and_type_index;
-		} CONSTANT_InvokeDynamic_info;
+		} InvokeDynamicInfo;
 	public:
 		using EntryVariant = std::variant<
-			Empty_info,
+			EmptyInfo,
 
-			CONSTANT_Class_info,
+			ClassInfo,
 
-			CONSTANT_Fieldref_info,
-			CONSTANT_Methodref_info,
-			CONSTANT_InterfaceMethodref_info,
+			FieldrefInfo,
+			MethodrefInfo,
+			InterfaceMethodrefInfo,
 
-			CONSTANT_String_info,
-			CONSTANT_Integer_info,
-			CONSTANT_Float_info,
+			StringInfo,
+			IntegerInfo,
+			FloatInfo,
 
-			CONSTANT_Long_info,
-			CONSTANT_Double_info,
+			LongInfo,
+			DoubleInfo,
 
-			CONSTANT_NameAndType_info,
-			CONSTANT_Utf8_info,
-			CONSTANT_MethodHandle_info,
-			CONSTANT_MethodType_info,
-			CONSTANT_InvokeDynamic_info
+			NameAndTypeInfo,
+			Utf8Info,
+			MethodHandleInfo,
+			MethodTypeInfo,
+			InvokeDynamicInfo
 		>;
 		Tag tag;
 		EntryVariant info;
@@ -155,45 +155,45 @@ namespace jcfp {
 			Tag tag_table[] = {
 				Tag::Empty,
 
-				Tag::CONSTANT_Class,
+				Tag::Class,
 
-				Tag::CONSTANT_Fieldref,
-				Tag::CONSTANT_Methodref,
-				Tag::CONSTANT_InterfaceMethodref,
+				Tag::Fieldref,
+				Tag::Methodref,
+				Tag::InterfaceMethodref,
 
-				Tag::CONSTANT_String,
-				Tag::CONSTANT_Integer,
-				Tag::CONSTANT_Float,
+				Tag::String,
+				Tag::Integer,
+				Tag::Float,
 
-				Tag::CONSTANT_Long,
-				Tag::CONSTANT_Double,
+				Tag::Long,
+				Tag::Double,
 
-				Tag::CONSTANT_NameAndType,
-				Tag::CONSTANT_Utf8,
-				Tag::CONSTANT_MethodHandle,
-				Tag::CONSTANT_InvokeDynamic
+				Tag::NameAndType,
+				Tag::Utf8,
+				Tag::MethodHandle,
+				Tag::InvokeDynamic
 			};
 
 			this->tag = tag_table[info.index()];
 		}
 
-		ConstantPoolEntry(CONSTANT_Class_info info) : tag(Tag::CONSTANT_Class), info(info) {}
+		ConstantPoolEntry(ClassInfo info) : tag(Tag::Class), info(info) {}
 
-		ConstantPoolEntry(CONSTANT_Fieldref_info info) : tag(Tag::CONSTANT_Fieldref), info(info) {}
-		ConstantPoolEntry(CONSTANT_Methodref_info info) : tag(Tag::CONSTANT_Methodref), info(info) {}
-		ConstantPoolEntry(CONSTANT_InterfaceMethodref_info info) : tag(Tag::CONSTANT_InterfaceMethodref), info(info) {}
+		ConstantPoolEntry(FieldrefInfo info) : tag(Tag::Fieldref), info(info) {}
+		ConstantPoolEntry(MethodrefInfo info) : tag(Tag::Methodref), info(info) {}
+		ConstantPoolEntry(InterfaceMethodrefInfo info) : tag(Tag::InterfaceMethodref), info(info) {}
 
-		ConstantPoolEntry(CONSTANT_String_info info) : tag(Tag::CONSTANT_String), info(info) {}
-		ConstantPoolEntry(CONSTANT_Integer_info info) : tag(Tag::CONSTANT_Integer), info(info) {}
-		ConstantPoolEntry(CONSTANT_Float_info info) : tag(Tag::CONSTANT_Float), info(info) {}
+		ConstantPoolEntry(StringInfo info) : tag(Tag::String), info(info) {}
+		ConstantPoolEntry(IntegerInfo info) : tag(Tag::Integer), info(info) {}
+		ConstantPoolEntry(FloatInfo info) : tag(Tag::Float), info(info) {}
 
-		ConstantPoolEntry(CONSTANT_Long_info info) : tag(Tag::CONSTANT_Long), info(info) {}
-		ConstantPoolEntry(CONSTANT_Double_info info) : tag(Tag::CONSTANT_Double), info(info) {}
+		ConstantPoolEntry(LongInfo info) : tag(Tag::Long), info(info) {}
+		ConstantPoolEntry(DoubleInfo info) : tag(Tag::Double), info(info) {}
 
-		ConstantPoolEntry(CONSTANT_NameAndType_info info) : tag(Tag::CONSTANT_NameAndType), info(info) {}
-		ConstantPoolEntry(CONSTANT_Utf8_info info) : tag(Tag::CONSTANT_Utf8), info(info) {}
-		ConstantPoolEntry(CONSTANT_MethodHandle_info info) : tag(Tag::CONSTANT_MethodHandle), info(info) {}
-		ConstantPoolEntry(CONSTANT_InvokeDynamic_info info) : tag(Tag::CONSTANT_InvokeDynamic), info(info) {}
+		ConstantPoolEntry(NameAndTypeInfo info) : tag(Tag::NameAndType), info(info) {}
+		ConstantPoolEntry(Utf8Info info) : tag(Tag::Utf8), info(info) {}
+		ConstantPoolEntry(MethodHandleInfo info) : tag(Tag::MethodHandle), info(info) {}
+		ConstantPoolEntry(InvokeDynamicInfo info) : tag(Tag::InvokeDynamic), info(info) {}
 	public:
 		static std::expected<ConstantPoolEntry, Error> parse(u1 *bytes);
 
@@ -205,7 +205,7 @@ namespace jcfp {
 
 		inline bool is_wide_entry()
 		{
-			return tag == Tag::CONSTANT_Double || tag == Tag::CONSTANT_Long;
+			return tag == Tag::Double || tag == Tag::Long;
 		}
 	};
 

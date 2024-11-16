@@ -51,99 +51,99 @@ std::expected<ConstantPoolEntry, Error> parse_constant_pool_entry(BufReader &rea
 	switch (tag) {
 		case Tag::Empty:
 		{
-			info = ConstantPoolEntry::Empty_info {};
+			info = ConstantPoolEntry::EmptyInfo {};
 
 			break;
 		}
-		case Tag::CONSTANT_Class:
+		case Tag::Class:
 		{
-			ConstantPoolEntry::CONSTANT_Class_info val;
+			ConstantPoolEntry::ClassInfo val;
 			val.name_index = reader.read_be<u2>();
 			info = val;
 
 			break;
 		}
-		case Tag::CONSTANT_Fieldref:
+		case Tag::Fieldref:
 		{
-			ConstantPoolEntry::CONSTANT_Fieldref_info val;
+			ConstantPoolEntry::FieldrefInfo val;
 			val.class_index = reader.read_be<u2>();
 			val.name_and_type_index = reader.read_be<u2>();
 			info = val;
 
 			break;
 		}
-		case Tag::CONSTANT_Methodref:
+		case Tag::Methodref:
 		{
-			ConstantPoolEntry::CONSTANT_Methodref_info val;
+			ConstantPoolEntry::MethodrefInfo val;
 			val.class_index = reader.read_be<u2>();
 			val.name_and_type_index = reader.read_be<u2>();
 			info = val;
 
 			break;
 		}
-		case Tag::CONSTANT_InterfaceMethodref:
+		case Tag::InterfaceMethodref:
 		{
-			ConstantPoolEntry::CONSTANT_InterfaceMethodref_info val;
+			ConstantPoolEntry::InterfaceMethodrefInfo val;
 			val.class_index = reader.read_be<u2>();
 			val.name_and_type_index = reader.read_be<u2>();
 			info = val;
 
 			break;
 		}
-		case Tag::CONSTANT_String:
+		case Tag::String:
 		{
-			ConstantPoolEntry::CONSTANT_String_info val;
+			ConstantPoolEntry::StringInfo val;
 			val.string_index = reader.read_be<u2>();
 			info = val;
 
 			break;
 		}
-		case Tag::CONSTANT_Integer:
+		case Tag::Integer:
 		{
-			ConstantPoolEntry::CONSTANT_Integer_info val;
+			ConstantPoolEntry::IntegerInfo val;
 			val.bytes = reader.read_be<u4>();
 			info = val;
 
 			break;
 		}
-		case Tag::CONSTANT_Float:
+		case Tag::Float:
 		{
-			ConstantPoolEntry::CONSTANT_Float_info val;
+			ConstantPoolEntry::FloatInfo val;
 			val.bytes = reader.read_be<u4>();
 			info = val;
 
 			break;
 		}
-		case Tag::CONSTANT_Long:
+		case Tag::Long:
 		{
-			ConstantPoolEntry::CONSTANT_Long_info val;
+			ConstantPoolEntry::LongInfo val;
 			val.high_bytes = reader.read_be<u4>();
 			val.low_bytes = reader.read_be<u4>();
 			info = val;
 
 			break;
 		}
-		case Tag::CONSTANT_Double:
+		case Tag::Double:
 		{
-			ConstantPoolEntry::CONSTANT_Double_info val;
+			ConstantPoolEntry::DoubleInfo val;
 			val.high_bytes = reader.read_be<u4>();
 			val.low_bytes = reader.read_be<u4>();
 			info = val;
 
 			break;
 		}
-		case Tag::CONSTANT_NameAndType:
+		case Tag::NameAndType:
 		{
-			ConstantPoolEntry::CONSTANT_NameAndType_info val;
+			ConstantPoolEntry::NameAndTypeInfo val;
 			val.name_index = reader.read_be<u2>();
 			val.descriptor_index = reader.read_be<u2>();
 			info = val;
 
 			break;
 		}
-		case Tag::CONSTANT_Utf8:
+		case Tag::Utf8:
 		{
-			ConstantPoolEntry::CONSTANT_Utf8_info val;
+			ConstantPoolEntry::Utf8Info val;
 
 			u2 length = reader.read_be<u2>();
 			std::vector<u1> bytes = reader.read_bytes(length);
@@ -153,26 +153,26 @@ std::expected<ConstantPoolEntry, Error> parse_constant_pool_entry(BufReader &rea
 
 			break;
 		}
-		case Tag::CONSTANT_MethodHandle:
+		case Tag::MethodHandle:
 		{
-			ConstantPoolEntry::CONSTANT_MethodHandle_info val;
+			ConstantPoolEntry::MethodHandleInfo val;
 			val.reference_kind = reader.read_be<u1>();
 			val.reference_index = reader.read_be<u2>();
 			info = val;
 
 			break;
 		}
-		case Tag::CONSTANT_MethodType:
+		case Tag::MethodType:
 		{
-			ConstantPoolEntry::CONSTANT_MethodType_info val;
+			ConstantPoolEntry::MethodTypeInfo val;
 			val.descriptor_index = reader.read_be<u2>();
 			info = val;
 
 			break;
 		}
-		case Tag::CONSTANT_InvokeDynamic:
+		case Tag::InvokeDynamic:
 		{
-			ConstantPoolEntry::CONSTANT_InvokeDynamic_info val;
+			ConstantPoolEntry::InvokeDynamicInfo val;
 			val.bootstrap_method_attr_index = reader.read_be<u2>();
 			val.name_and_type_index = reader.read_be<u2>();
 			info = val;
