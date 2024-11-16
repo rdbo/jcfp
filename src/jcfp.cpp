@@ -31,7 +31,7 @@ std::expected<ClassFile, Error> ClassFile::parse(u1 *bytes)
 	u2 super_class;
 	std::vector<u2> interfaces;
 	std::vector<field_info> fields;
-	std::vector<u2> methods;
+	std::vector<method_info> methods;
 	std::vector<attribute_info> attributes;
 
 	BufReader reader = BufReader(bytes);
@@ -77,6 +77,42 @@ std::expected<ClassFile, Error> ClassFile::parse(u1 *bytes)
 			std::move(attributes)
 		});
 	}
+
+	u2 methods_count = reader.read_be<u2>();
+	for (u2 i = 0; i < methods_count; ++i) {
+		u2 access_flags = reader.read_be<u2>();
+		u2 name_index = reader.read_be<u2>();
+		u2 descriptor_index = reader.read_be<u2>();
+
+		std::vector<attribute_info> attributes;
+		u2 attributes_count = reader.read_be<u2>();
+		for (u2 j = 0; j < attributes_count; ++j) {
+			u2 attribute_name_index = reader.read_be<u2>();
+			u4 attribute_length = reader.read_be<u4>();
+			std::vector<u1> info = reader.read_bytes(attribute_length);
+			attributes.push_back(attribute_info {
+				attribute_name_index,
+				std::move(info)
+			});
+		}
+
+		methods.push_back(method_info {
+			access_flags, name_index, descriptor_index,
+			std::move(attributes)
+		});
+	}
+
+	u2 attributes_count = reader.read_be<u2>();
+	for (u2 i = 0; i < attributes_count; ++i) {
+		u2 attribute_name_index = reader.read_be<u2>();
+		u4 attribute_length = reader.read_be<u4>();
+		std::vector<u1> info = reader.read_bytes(attribute_length);
+		attributes.push_back(attribute_info {
+			attribute_name_index,
+			std::move(info)
+		});
+	}
+	
 
 	return ClassFile(magic, minor_version, major_version, constant_pool,
 	                 access_flags, this_class, super_class, interfaces,
