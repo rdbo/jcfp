@@ -18,8 +18,6 @@
 
 using namespace jcfp;
 
-#define CLASSFILE_MAGIC 0xCAFEBABE
-
 std::expected<ClassFile, Error> ClassFile::parse(u1 *bytes)
 {
 	u4 magic;

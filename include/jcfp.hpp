@@ -22,6 +22,8 @@
 #include "constant_pool.hpp"
 #include "error.hpp"
 
+#define CLASSFILE_MAGIC 0xCAFEBABE
+
 namespace jcfp {
 	typedef struct {
 		u2 attribute_name_index;
