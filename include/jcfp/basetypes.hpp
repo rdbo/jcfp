@@ -24,7 +24,7 @@ namespace jcfp {
 	typedef uint32_t u4;
 
 	/* General use access flags */
-	enum class AccessFlags : u2 {
+	enum AccessFlags : u2 {
 		ACC_PUBLIC       = 0x0001,
 		ACC_PRIVATE      = 0x0002,
 		ACC_PROTECTED    = 0x0004,
