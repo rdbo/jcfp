@@ -18,7 +18,7 @@
 
 using namespace jcfp;
 
-std::expected<ConstantPool, Error> parse_constant_pool(BufReader &reader)
+std::expected<ConstantPool, Error> ConstantPool::parse(BufReader &reader)
 {
 	std::vector<ConstantPoolEntry> entries;
 
@@ -30,7 +30,7 @@ std::expected<ConstantPool, Error> parse_constant_pool(BufReader &reader)
 	entries.push_back(ConstantPoolEntry());
 
 	for (u2 i = 1; i < constant_pool_count - 1; ++i) {
-		auto result = parse_constant_pool_entry(reader);
+		auto result = ConstantPoolEntry::parse(reader);
 		if (!result.has_value())
 			return std::unexpected(result.error());
 
@@ -40,7 +40,7 @@ std::expected<ConstantPool, Error> parse_constant_pool(BufReader &reader)
 	return ConstantPool(entries);
 }
 
-std::expected<ConstantPoolEntry, Error> parse_constant_pool_entry(BufReader &reader)
+std::expected<ConstantPoolEntry, Error> ConstantPoolEntry::parse(BufReader &reader)
 {
 	using Tag = ConstantPoolEntry::Tag;
 	using EntryVariant = ConstantPoolEntry::EntryVariant;
@@ -185,15 +185,15 @@ std::expected<ConstantPoolEntry, Error> parse_constant_pool_entry(BufReader &rea
 }
 
 
-std::expected<ConstantPoolEntry, Error> ConstantPoolEntry::parse(u1 *bytes)
+std::expected<ConstantPoolEntry, Error> ConstantPoolEntry::parse(u1 *bytes, size_t max_offset)
 {
-	BufReader reader = BufReader(bytes);
-	return parse_constant_pool_entry(reader);
+	BufReader reader = BufReader(bytes, max_offset);
+	return ConstantPoolEntry::parse(reader);
 }
 
-std::expected<ConstantPool, Error> ConstantPool::parse(u1 *bytes)
+std::expected<ConstantPool, Error> ConstantPool::parse(u1 *bytes, size_t max_offset)
 {
-	BufReader reader = BufReader(bytes);
+	BufReader reader = BufReader(bytes, max_offset);
 
-	return parse_constant_pool(reader);
+	return ConstantPool::parse(reader);
 }

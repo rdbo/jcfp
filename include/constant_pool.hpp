@@ -19,6 +19,7 @@
 #include <vector>
 #include <variant>
 #include <string>
+#include "utils.hpp"
 #include "basetypes.hpp"
 #include "error.hpp"
 
@@ -195,7 +196,8 @@ namespace jcfp {
 		ConstantPoolEntry(MethodHandleInfo info) : tag(Tag::MethodHandle), info(info) {}
 		ConstantPoolEntry(InvokeDynamicInfo info) : tag(Tag::InvokeDynamic), info(info) {}
 	public:
-		static std::expected<ConstantPoolEntry, Error> parse(u1 *bytes);
+		static std::expected<ConstantPoolEntry, Error> parse(BufReader &reader);
+		static std::expected<ConstantPoolEntry, Error> parse(u1 *bytes, size_t max_offset=0);
 
 		template <typename T>
 		inline T get()
@@ -217,7 +219,8 @@ namespace jcfp {
 		ConstantPool() {}
 		ConstantPool(std::vector<ConstantPoolEntry> entries) : entries(entries) {}
 	public:
-		static std::expected<ConstantPool, Error> parse(u1 *bytes);
+		static std::expected<ConstantPool, Error> parse(BufReader &reader);
+		static std::expected<ConstantPool, Error> parse(u1 *bytes, size_t max_offset=0);
 
 		/*
 		 * The constant pool entries are defined as:
