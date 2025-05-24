@@ -22,12 +22,12 @@
 namespace jcfp {
 	class BufReader {
 	private:
-		u1 *buffer;
+		const u1 *buffer;
 		size_t prev_offset = 0;
 		size_t offset = 0;
 		size_t max_offset = 0;
 	public:
-		BufReader(u1 *buffer, size_t max_offset=0) : buffer(buffer), max_offset(max_offset) {}
+		BufReader(const u1 *buffer, size_t max_offset=0) : buffer(buffer), max_offset(max_offset) {}
 	public:
 		template <typename T>
 		inline T read() // throws std::out_of_range

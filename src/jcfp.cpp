@@ -18,7 +18,7 @@
 
 using namespace jcfp;
 
-std::expected<ClassFile, Error> ClassFile::parse(u1 *bytes)
+std::expected<ClassFile, Error> ClassFile::parse(const u1 *bytes)
 {
 	u4 magic;
 	u2 minor_version;
