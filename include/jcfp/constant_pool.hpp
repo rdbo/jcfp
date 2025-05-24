@@ -242,7 +242,7 @@ namespace jcfp {
 			return entries[index].tag;
 		}
 
-		inline ConstantPoolEntry get_entry(u2 index) {
+		inline ConstantPoolEntry &get_entry(u2 index) {
 			return entries[index];
 		}
 
