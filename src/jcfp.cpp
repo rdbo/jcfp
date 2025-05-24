@@ -54,7 +54,7 @@ std::expected<ClassFile, Error> ClassFile::parse(const u1 *bytes)
 
 	u2 fields_count = reader.read_be<u2>();
 	for (u2 i = 0; i < fields_count; ++i) {
-		u2 access_flags = reader.read_be<u2>();
+		AccessFlags access_flags = reader.read_be<AccessFlags>(); // u2
 		u2 name_index = reader.read_be<u2>();
 		u2 descriptor_index = reader.read_be<u2>();
 
@@ -78,7 +78,7 @@ std::expected<ClassFile, Error> ClassFile::parse(const u1 *bytes)
 
 	u2 methods_count = reader.read_be<u2>();
 	for (u2 i = 0; i < methods_count; ++i) {
-		u2 access_flags = reader.read_be<u2>();
+		AccessFlags access_flags = reader.read_be<AccessFlags>();
 		u2 name_index = reader.read_be<u2>();
 		u2 descriptor_index = reader.read_be<u2>();
 

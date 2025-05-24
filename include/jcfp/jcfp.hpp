@@ -33,7 +33,7 @@ namespace jcfp {
 	} AttributeInfo;
 
 	typedef struct {
-		u2 access_flags;
+		AccessFlags access_flags;
 		u2 name_index;
 		u2 descriptor_index;
 		// u2 attributes_count;
@@ -42,7 +42,7 @@ namespace jcfp {
 	} FieldInfo;
 
 	typedef struct {
-		u2 access_flags;
+		AccessFlags access_flags;
 		u2 name_index;
 		u2 descriptor_index;
 		// u2 attributes_count;
