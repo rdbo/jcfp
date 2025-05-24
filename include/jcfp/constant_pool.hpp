@@ -221,7 +221,8 @@ namespace jcfp {
 	public:
 		static std::expected<ConstantPool, Error> parse(BufReader &reader);
 		static std::expected<ConstantPool, Error> parse(u1 *bytes, size_t max_offset=0);
-
+		std::vector<u1> encode();
+	public:
 		/*
 		 * The constant pool entries are defined as:
 		 *
