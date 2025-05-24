@@ -1,4 +1,4 @@
-#include <jcfp.hpp>
+#include <jcfp/jcfp.hpp>
 #include <iostream>
 
 using namespace jcfp;

@@ -13,8 +13,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
- #include <jcfp.hpp>
- #include "utils.hpp"
+ #include <jcfp/jcfp.hpp>
+ #include <jcfp/utils.hpp>
 
 using namespace jcfp;
 
