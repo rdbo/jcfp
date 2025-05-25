@@ -25,19 +25,19 @@ namespace jcfp {
                 const u1 *buffer;
                 size_t prev_offset = 0;
                 size_t offset = 0;
-                size_t max_offset = 0;
+                size_t max_length = 0;
         public:
-                BufReader(const u1 *buffer, size_t max_offset=0) : buffer(buffer), max_offset(max_offset) {}
+                BufReader(const u1 *buffer, size_t max_length=0) : buffer(buffer), max_length(max_length) {}
         public:
                 template <typename T>
                 inline T read() // throws std::out_of_range
                 {
                         T *t = (T *)&this->buffer[this->offset];
                         const auto next_offset = this->offset + sizeof(T);
-                        if (this->max_offset > 0 && next_offset > this->max_offset) {
+                        if (this->max_length > 0 && next_offset > this->max_length) {
                                 throw std::out_of_range(
                                         "Attempted to read from " + std::to_string(offset) + " to " +
-                                        std::to_string(next_offset) + "(max offset: " + std::to_string(this->max_offset) + ")"
+                                        std::to_string(next_offset) + "(max offset: " + std::to_string(this->max_length) + ")"
                                 );
                         }
 
@@ -79,6 +79,45 @@ namespace jcfp {
                 inline size_t pos()
                 {
                         return this->offset;
+                }
+        };
+
+        class ByteStream {
+        private:
+                std::vector<u1> bytes;
+        public:
+                std::vector<u1> collect()
+                {
+                        std::vector<u1> buf = this->bytes;
+                        this->bytes = {};
+                        return buf;
+                }
+        public:
+                void write_bytes(const std::vector<u1> &buf)
+                {
+                        this->bytes.insert(this->bytes.end(), buf.begin(), buf.end());
+                }
+
+                void write_bytes(const u1 *buf, size_t size)
+                {
+                        this->bytes.insert(this->bytes.end(), buf, &buf[size]);
+                }
+
+                template <typename T>
+                inline void write(const T &value)
+                {
+                        this->write_bytes(&value, &value + 1);
+                }
+
+                template <typename T>
+                inline void write_be(const T &value_le)
+                {
+                        u1 buf[sizeof(T)];
+                        for (size_t i = 0; i < sizeof(buf); ++i) {
+                                buf[i] = *((u1 *)&value_le + sizeof(T) - i - 1);
+                        }
+
+                        this->write_bytes(buf, sizeof(buf));
                 }
         };
 }

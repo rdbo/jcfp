@@ -91,7 +91,8 @@ namespace jcfp {
                   attributes(attributes)
                 {}
         public:
-                static std::expected<ClassFile, Error> parse(const u1 *bytes);
+                static std::expected<ClassFile, Error> parse(const u1 *bytes, size_t max_length);
+                static inline std::expected<ClassFile, Error> parse(const u1 *bytes) { return parse(bytes, 0); }
                 std::vector<u1> encode();
         };
 }

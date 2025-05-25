@@ -185,15 +185,15 @@ std::expected<ConstantPoolEntry, Error> ConstantPoolEntry::parse(BufReader &read
 }
 
 
-std::expected<ConstantPoolEntry, Error> ConstantPoolEntry::parse(u1 *bytes, size_t max_offset)
+std::expected<ConstantPoolEntry, Error> ConstantPoolEntry::parse(u1 *bytes, size_t max_length)
 {
-        BufReader reader = BufReader(bytes, max_offset);
+        BufReader reader = BufReader(bytes, max_length);
         return ConstantPoolEntry::parse(reader);
 }
 
-std::expected<ConstantPool, Error> ConstantPool::parse(u1 *bytes, size_t max_offset)
+std::expected<ConstantPool, Error> ConstantPool::parse(u1 *bytes, size_t max_length)
 {
-        BufReader reader = BufReader(bytes, max_offset);
+        BufReader reader = BufReader(bytes, max_length);
 
         return ConstantPool::parse(reader);
 }

@@ -18,7 +18,7 @@
 
 using namespace jcfp;
 
-std::expected<ClassFile, Error> ClassFile::parse(const u1 *bytes)
+std::expected<ClassFile, Error> ClassFile::parse(const u1 *bytes, size_t max_length)
 {
         u4 magic;
         u2 minor_version;
@@ -32,7 +32,7 @@ std::expected<ClassFile, Error> ClassFile::parse(const u1 *bytes)
         std::vector<MethodInfo> methods;
         std::vector<AttributeInfo> attributes;
 
-        BufReader reader = BufReader(bytes);
+        BufReader reader = BufReader(bytes, max_length);
 
         magic = reader.read_be<u4>();
         if (magic != CLASSFILE_MAGIC)
@@ -115,4 +115,15 @@ std::expected<ClassFile, Error> ClassFile::parse(const u1 *bytes)
         return ClassFile(magic, minor_version, major_version, constant_pool,
                          access_flags, this_class, super_class, interfaces,
                          fields, methods, attributes);
+}
+
+std::vector<u1> ClassFile::encode()
+{
+        ByteStream stream = ByteStream();
+
+        stream.write_be(this->magic);
+        stream.write_be(this->minor_version);
+        stream.write_be(this->major_version);
+
+        return stream.collect();
 }
