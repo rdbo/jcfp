@@ -20,8 +20,8 @@
 #include <stdexcept>
 
 #ifdef DEBUG
-#       define LOG(fmt, ...) printf("[JCFP] " fmt, ##__VA_ARGS__)
-#       define ERR(fmt, ...) printf("[JCFP] [ERROR] " fmt, ##__VA_ARGS__)
+#       define LOG(fmt, ...) printf("[JCFP] " fmt "\n", ##__VA_ARGS__)
+#       define ERR(fmt, ...) printf("[JCFP] [ERROR] " fmt "\n", ##__VA_ARGS__)
 #else
 #       define LOG(fmt, ...)
 #       define ERR(fmt, ...)
