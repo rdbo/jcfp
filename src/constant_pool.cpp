@@ -23,7 +23,7 @@ std::expected<ConstantPool, Error> ConstantPool::parse(BufReader &reader)
 {
         std::vector<ConstantPoolEntry> entries;
 
-        LOG("Parsing constant pool (offset: %ld)...", reader.pos());
+        LOG("Parsing constant pool (offset: %lu)...", reader.pos());
 
         u2 constant_pool_count = reader.read_be<u2>();
         if (constant_pool_count == 0) {
@@ -37,15 +37,15 @@ std::expected<ConstantPool, Error> ConstantPool::parse(BufReader &reader)
         for (u2 i = 1; i <= constant_pool_count - 1; ++i) {
                 auto result = ConstantPoolEntry::parse(reader);
                 if (!result.has_value()) {
-                        ERR("Failed to parse constant pool entry '%d'", i);
+                        ERR("Failed to parse constant pool entry '%hu'", i);
                         return std::unexpected(result.error());
                 }
 
-                LOG("New constant pool entry parsed (%d): %s", i, result.value().to_string().c_str());
+                LOG("New constant pool entry parsed (%hu): %s", i, result.value().to_string().c_str());
                 entries.push_back(result.value());
         }
 
-        LOG("Constant pool parsed successfully (offset: %ld)", reader.pos());
+        LOG("Constant pool parsed successfully (offset: %lu)", reader.pos());
 
         return ConstantPool(entries);
 }

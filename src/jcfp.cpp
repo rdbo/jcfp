@@ -42,7 +42,7 @@ std::expected<ClassFile, Error> ClassFile::parse(const u1 *bytes, size_t max_len
 
         minor_version = reader.read_be<u2>();
         major_version = static_cast<MajorVersion>(reader.read_be<u2>());
-        LOG("ClassFile version: %hd %hd", major_version, minor_version);
+        LOG("ClassFile version: %hu %hu", major_version, minor_version);
 
         auto result = ConstantPool::parse(reader);
         if (!result.has_value())
@@ -52,18 +52,19 @@ std::expected<ClassFile, Error> ClassFile::parse(const u1 *bytes, size_t max_len
         access_flags = reader.read_be<AccessFlags>();
         this_class = reader.read_be<u2>();
         super_class = reader.read_be<u2>();
-        LOG("Access flags: %hd", access_flags);
-        LOG("This class: %hd", this_class);
-        LOG("Super class: %hd", super_class);
+        LOG("Access flags: %hu", access_flags);
+        LOG("This class: %hu", this_class);
+        LOG("Super class: %hu", super_class);
 
         u2 interfaces_count = reader.read_be<u2>();
-        LOG("Interfaces count: %hd", interfaces_count);
+        LOG("Interfaces count: %hu", interfaces_count);
         for (u2 i = 0; i < interfaces_count; ++i) {
                 u2 iface = reader.read_be<u2>();
                 interfaces.push_back(iface);
         }
 
         u2 fields_count = reader.read_be<u2>();
+        LOG("Fields count: %hu", fields_count);
         for (u2 i = 0; i < fields_count; ++i) {
                 AccessFlags flags = reader.read_be<AccessFlags>(); // u2
                 u2 name_index = reader.read_be<u2>();
@@ -88,6 +89,7 @@ std::expected<ClassFile, Error> ClassFile::parse(const u1 *bytes, size_t max_len
         }
 
         u2 methods_count = reader.read_be<u2>();
+        LOG("Methods count: %hu", methods_count);
         for (u2 i = 0; i < methods_count; ++i) {
                 AccessFlags flags = reader.read_be<AccessFlags>();
                 u2 name_index = reader.read_be<u2>();
@@ -112,6 +114,7 @@ std::expected<ClassFile, Error> ClassFile::parse(const u1 *bytes, size_t max_len
         }
 
         u2 attributes_count = reader.read_be<u2>();
+        LOG("Attributes count: %hu", attributes_count);
         for (u2 i = 0; i < attributes_count; ++i) {
                 u2 attribute_name_index = reader.read_be<u2>();
                 u4 attribute_length = reader.read_be<u4>();
@@ -121,7 +124,8 @@ std::expected<ClassFile, Error> ClassFile::parse(const u1 *bytes, size_t max_len
                         std::move(info)
                 });
         }
-        
+
+        LOG("ClassFile parsed successfully (offset: %lu)", reader.pos());
 
         return ClassFile(magic, minor_version, major_version, constant_pool,
                          access_flags, this_class, super_class, interfaces,
