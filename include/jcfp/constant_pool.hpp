@@ -24,273 +24,273 @@
 #include "error.hpp"
 
 namespace jcfp {
-	class ConstantPoolEntry {
-	public:
-		enum Tag : u1 {
-			/*
-			 * Empty entries are used for:
-			 *   - The first index of the constant pool, which is always invalid
-			 *   - The additional unused indices of Double and Long entries
-			 */
-			Empty = 0,
+        class ConstantPoolEntry {
+        public:
+                enum Tag : u1 {
+                        /*
+                         * Empty entries are used for:
+                         *   - The first index of the constant pool, which is always invalid
+                         *   - The additional unused indices of Double and Long entries
+                         */
+                        Empty = 0,
 
-			/* Standard constant pool entries */
-			Class              = 7,
-			Fieldref           = 9,
-			Methodref          = 10,
-			InterfaceMethodref = 11,
-			String             = 8,
-			Integer            = 3,
-			Float              = 4,
-			Long               = 5,
-			Double             = 6,
-			NameAndType        = 12,
-			Utf8               = 1,
-			MethodHandle       = 15,
-			MethodType         = 16,
-			InvokeDynamic      = 18,
-		};
+                        /* Standard constant pool entries */
+                        Class              = 7,
+                        Fieldref           = 9,
+                        Methodref          = 10,
+                        InterfaceMethodref = 11,
+                        String             = 8,
+                        Integer            = 3,
+                        Float              = 4,
+                        Long               = 5,
+                        Double             = 6,
+                        NameAndType        = 12,
+                        Utf8               = 1,
+                        MethodHandle       = 15,
+                        MethodType         = 16,
+                        InvokeDynamic      = 18,
+                };
 
-		typedef struct {} EmptyInfo;
+                typedef struct {} EmptyInfo;
 
-		typedef struct {
-			u2 name_index;
-		} ClassInfo;
+                typedef struct {
+                        u2 name_index;
+                } ClassInfo;
 
-		/*
-		 * NOTE: Even though Fieldref, Methodref and InterfaceMethodref
-		 *       are the same, we are following the ClassFile Format
-		 *       specification, and they are separate structs there.
-		 *
-		 *       See: https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html
-		 */
-		typedef struct {
-			u2 class_index;
-			u2 name_and_type_index;
-		} FieldrefInfo;
+                /*
+                 * NOTE: Even though Fieldref, Methodref and InterfaceMethodref
+                 *       are the same, we are following the ClassFile Format
+                 *       specification, and they are separate structs there.
+                 *
+                 *       See: https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html
+                 */
+                typedef struct {
+                        u2 class_index;
+                        u2 name_and_type_index;
+                } FieldrefInfo;
 
-		typedef struct {
-			u2 class_index;
-			u2 name_and_type_index;
-		} MethodrefInfo;
+                typedef struct {
+                        u2 class_index;
+                        u2 name_and_type_index;
+                } MethodrefInfo;
 
-		typedef struct {
-			u2 class_index;
-			u2 name_and_type_index;
-		} InterfaceMethodrefInfo;
+                typedef struct {
+                        u2 class_index;
+                        u2 name_and_type_index;
+                } InterfaceMethodrefInfo;
 
-		typedef struct {
-			u2 string_index;
-		} StringInfo;
+                typedef struct {
+                        u2 string_index;
+                } StringInfo;
 
-		typedef struct {
-			u4 bytes;
-		} IntegerInfo;
+                typedef struct {
+                        u4 bytes;
+                } IntegerInfo;
 
-		typedef struct {
-			u4 bytes;
-		} FloatInfo;
+                typedef struct {
+                        u4 bytes;
+                } FloatInfo;
 
-		typedef struct {
-			u4 high_bytes;
-			u4 low_bytes;
-		} LongInfo;
+                typedef struct {
+                        u4 high_bytes;
+                        u4 low_bytes;
+                } LongInfo;
 
-		typedef struct {
-			u4 high_bytes;
-			u4 low_bytes;
-		} DoubleInfo;
+                typedef struct {
+                        u4 high_bytes;
+                        u4 low_bytes;
+                } DoubleInfo;
 
-		typedef struct {
-			u2 name_index;
-			u2 descriptor_index;
-		} NameAndTypeInfo;
+                typedef struct {
+                        u2 name_index;
+                        u2 descriptor_index;
+                } NameAndTypeInfo;
 
-		typedef struct {
-			// u2 length;
-			// u1 bytes[];
-			std::string bytes;
-		} Utf8Info;
+                typedef struct {
+                        // u2 length;
+                        // u1 bytes[];
+                        std::string bytes;
+                } Utf8Info;
 
-		typedef struct {
-			u1 reference_kind;
-			u2 reference_index;
-		} MethodHandleInfo;
+                typedef struct {
+                        u1 reference_kind;
+                        u2 reference_index;
+                } MethodHandleInfo;
 
-		typedef struct {
-			u2 descriptor_index;
-		} MethodTypeInfo;
+                typedef struct {
+                        u2 descriptor_index;
+                } MethodTypeInfo;
 
-		typedef struct {
-			u2 bootstrap_method_attr_index;
-			u2 name_and_type_index;
-		} InvokeDynamicInfo;
-	public:
-		using EntryVariant = std::variant<
-			EmptyInfo,
+                typedef struct {
+                        u2 bootstrap_method_attr_index;
+                        u2 name_and_type_index;
+                } InvokeDynamicInfo;
+        public:
+                using EntryVariant = std::variant<
+                        EmptyInfo,
 
-			ClassInfo,
+                        ClassInfo,
 
-			FieldrefInfo,
-			MethodrefInfo,
-			InterfaceMethodrefInfo,
+                        FieldrefInfo,
+                        MethodrefInfo,
+                        InterfaceMethodrefInfo,
 
-			StringInfo,
-			IntegerInfo,
-			FloatInfo,
+                        StringInfo,
+                        IntegerInfo,
+                        FloatInfo,
 
-			LongInfo,
-			DoubleInfo,
+                        LongInfo,
+                        DoubleInfo,
 
-			NameAndTypeInfo,
-			Utf8Info,
-			MethodHandleInfo,
-			MethodTypeInfo,
-			InvokeDynamicInfo
-		>;
-		Tag tag;
-		EntryVariant info;
-	public:
-		ConstantPoolEntry() : tag(Tag::Empty) {}
-		ConstantPoolEntry(EntryVariant info) : info(info) {
-			Tag tag_table[] = {
-				Tag::Empty,
+                        NameAndTypeInfo,
+                        Utf8Info,
+                        MethodHandleInfo,
+                        MethodTypeInfo,
+                        InvokeDynamicInfo
+                >;
+                Tag tag;
+                EntryVariant info;
+        public:
+                ConstantPoolEntry() : tag(Tag::Empty) {}
+                ConstantPoolEntry(EntryVariant info) : info(info) {
+                        Tag tag_table[] = {
+                                Tag::Empty,
 
-				Tag::Class,
+                                Tag::Class,
 
-				Tag::Fieldref,
-				Tag::Methodref,
-				Tag::InterfaceMethodref,
+                                Tag::Fieldref,
+                                Tag::Methodref,
+                                Tag::InterfaceMethodref,
 
-				Tag::String,
-				Tag::Integer,
-				Tag::Float,
+                                Tag::String,
+                                Tag::Integer,
+                                Tag::Float,
 
-				Tag::Long,
-				Tag::Double,
+                                Tag::Long,
+                                Tag::Double,
 
-				Tag::NameAndType,
-				Tag::Utf8,
-				Tag::MethodHandle,
-				Tag::InvokeDynamic
-			};
+                                Tag::NameAndType,
+                                Tag::Utf8,
+                                Tag::MethodHandle,
+                                Tag::InvokeDynamic
+                        };
 
-			this->tag = tag_table[info.index()];
-		}
+                        this->tag = tag_table[info.index()];
+                }
 
-		ConstantPoolEntry(ClassInfo info) : tag(Tag::Class), info(info) {}
+                ConstantPoolEntry(ClassInfo info) : tag(Tag::Class), info(info) {}
 
-		ConstantPoolEntry(FieldrefInfo info) : tag(Tag::Fieldref), info(info) {}
-		ConstantPoolEntry(MethodrefInfo info) : tag(Tag::Methodref), info(info) {}
-		ConstantPoolEntry(InterfaceMethodrefInfo info) : tag(Tag::InterfaceMethodref), info(info) {}
+                ConstantPoolEntry(FieldrefInfo info) : tag(Tag::Fieldref), info(info) {}
+                ConstantPoolEntry(MethodrefInfo info) : tag(Tag::Methodref), info(info) {}
+                ConstantPoolEntry(InterfaceMethodrefInfo info) : tag(Tag::InterfaceMethodref), info(info) {}
 
-		ConstantPoolEntry(StringInfo info) : tag(Tag::String), info(info) {}
-		ConstantPoolEntry(IntegerInfo info) : tag(Tag::Integer), info(info) {}
-		ConstantPoolEntry(FloatInfo info) : tag(Tag::Float), info(info) {}
+                ConstantPoolEntry(StringInfo info) : tag(Tag::String), info(info) {}
+                ConstantPoolEntry(IntegerInfo info) : tag(Tag::Integer), info(info) {}
+                ConstantPoolEntry(FloatInfo info) : tag(Tag::Float), info(info) {}
 
-		ConstantPoolEntry(LongInfo info) : tag(Tag::Long), info(info) {}
-		ConstantPoolEntry(DoubleInfo info) : tag(Tag::Double), info(info) {}
+                ConstantPoolEntry(LongInfo info) : tag(Tag::Long), info(info) {}
+                ConstantPoolEntry(DoubleInfo info) : tag(Tag::Double), info(info) {}
 
-		ConstantPoolEntry(NameAndTypeInfo info) : tag(Tag::NameAndType), info(info) {}
-		ConstantPoolEntry(Utf8Info info) : tag(Tag::Utf8), info(info) {}
-		ConstantPoolEntry(MethodHandleInfo info) : tag(Tag::MethodHandle), info(info) {}
-		ConstantPoolEntry(InvokeDynamicInfo info) : tag(Tag::InvokeDynamic), info(info) {}
-	public:
-		static std::expected<ConstantPoolEntry, Error> parse(BufReader &reader);
-		static std::expected<ConstantPoolEntry, Error> parse(u1 *bytes, size_t max_offset=0);
+                ConstantPoolEntry(NameAndTypeInfo info) : tag(Tag::NameAndType), info(info) {}
+                ConstantPoolEntry(Utf8Info info) : tag(Tag::Utf8), info(info) {}
+                ConstantPoolEntry(MethodHandleInfo info) : tag(Tag::MethodHandle), info(info) {}
+                ConstantPoolEntry(InvokeDynamicInfo info) : tag(Tag::InvokeDynamic), info(info) {}
+        public:
+                static std::expected<ConstantPoolEntry, Error> parse(BufReader &reader);
+                static std::expected<ConstantPoolEntry, Error> parse(u1 *bytes, size_t max_offset=0);
 
-		template <typename T>
-		inline T get()
-		{
-			return std::get<T>(this->info);
-		}
+                template <typename T>
+                inline T get()
+                {
+                        return std::get<T>(this->info);
+                }
 
-		inline bool is_wide_entry()
-		{
-			return tag == Tag::Double || tag == Tag::Long;
-		}
-	};
+                inline bool is_wide_entry()
+                {
+                        return tag == Tag::Double || tag == Tag::Long;
+                }
+        };
 
-	class ConstantPool {
-	private:
-		/* Modifying the entries directly could cause issues, use the helper functions */
-		std::vector<ConstantPoolEntry> entries;
-	public:
-		ConstantPool() {}
-		ConstantPool(std::vector<ConstantPoolEntry> entries) : entries(entries) {}
-	public:
-		static std::expected<ConstantPool, Error> parse(BufReader &reader);
-		static std::expected<ConstantPool, Error> parse(u1 *bytes, size_t max_offset=0);
-		std::vector<u1> encode();
-	public:
-		/*
-		 * The constant pool entries are defined as:
-		 *
-		 *     cp_info constant_pool[constant_pool_count-1];
-		 *
-		 * Which means that `constant_pool_count = total_entries + 1`
-		 * This information is required for writing the ClassFile back
-		 * into bytes
-		 *
-		 * Iteration goes from 1 to count - 1
-		 */
-		inline u2 count() {
-			return entries.size() + 1;
-		}
+        class ConstantPool {
+        private:
+                /* Modifying the entries directly could cause issues, use the helper functions */
+                std::vector<ConstantPoolEntry> entries;
+        public:
+                ConstantPool() {}
+                ConstantPool(std::vector<ConstantPoolEntry> entries) : entries(entries) {}
+        public:
+                static std::expected<ConstantPool, Error> parse(BufReader &reader);
+                static std::expected<ConstantPool, Error> parse(u1 *bytes, size_t max_offset=0);
+                std::vector<u1> encode();
+        public:
+                /*
+                 * The constant pool entries are defined as:
+                 *
+                 *     cp_info constant_pool[constant_pool_count-1];
+                 *
+                 * Which means that `constant_pool_count = total_entries + 1`
+                 * This information is required for writing the ClassFile back
+                 * into bytes
+                 *
+                 * Iteration goes from 1 to count - 1
+                 */
+                inline u2 count() {
+                        return entries.size() + 1;
+                }
 
-		/* Helper functions */
-		inline ConstantPoolEntry::Tag get_tag(u2 index) {
-			return entries[index].tag;
-		}
+                /* Helper functions */
+                inline ConstantPoolEntry::Tag get_tag(u2 index) {
+                        return entries[index].tag;
+                }
 
-		inline ConstantPoolEntry &get_entry(u2 index) {
-			return entries[index];
-		}
+                inline ConstantPoolEntry &get_entry(u2 index) {
+                        return entries[index];
+                }
 
-		inline std::vector<ConstantPoolEntry> &get_entries() {
-			return this->entries;
-		}
+                inline std::vector<ConstantPoolEntry> &get_entries() {
+                        return this->entries;
+                }
 
-		inline void push_entry(ConstantPoolEntry entry) {
-			entries.push_back(entry);
-			if (entry.is_wide_entry()) {
-				entries.push_back(ConstantPoolEntry());
-			}
-		}
+                inline void push_entry(ConstantPoolEntry entry) {
+                        entries.push_back(entry);
+                        if (entry.is_wide_entry()) {
+                                entries.push_back(ConstantPoolEntry());
+                        }
+                }
 
-		inline ConstantPoolEntry pop_entry() {
-			if (entries.size() > 1 && entries[entries.size() - 2].is_wide_entry()) {
-				entries.pop_back(); // Last entry is Empty added due to a preceding wide entry,
-			                            // will be skipped
-			}
+                inline ConstantPoolEntry pop_entry() {
+                        if (entries.size() > 1 && entries[entries.size() - 2].is_wide_entry()) {
+                                entries.pop_back(); // Last entry is Empty added due to a preceding wide entry,
+                                                    // will be skipped
+                        }
 
-			ConstantPoolEntry last_entry = entries.back();
-			entries.pop_back();
+                        ConstantPoolEntry last_entry = entries.back();
+                        entries.pop_back();
 
-			return last_entry;
-		}
+                        return last_entry;
+                }
 
-		inline void insert_entry(u2 index, ConstantPoolEntry entry)
-		{
-			if (entry.is_wide_entry())
-				entries.insert(entries.begin() + index, ConstantPoolEntry());
+                inline void insert_entry(u2 index, ConstantPoolEntry entry)
+                {
+                        if (entry.is_wide_entry())
+                                entries.insert(entries.begin() + index, ConstantPoolEntry());
 
-			entries.insert(entries.begin() + index, entry);
-		}
+                        entries.insert(entries.begin() + index, entry);
+                }
 
-		inline void remove_entry(u2 index)
-		{
-			ConstantPoolEntry entry = entries[index];
+                inline void remove_entry(u2 index)
+                {
+                        ConstantPoolEntry entry = entries[index];
 
-			entries.erase(entries.begin() + index);
-			
-			if (index > 1 && entries[index - 1].is_wide_entry()) {
-				entries.erase(entries.begin() + (index - 1));
-			} else if (entry.is_wide_entry()) {
-				entries.erase(entries.begin() + index);
-			}
-		}
-	};
+                        entries.erase(entries.begin() + index);
+                        
+                        if (index > 1 && entries[index - 1].is_wide_entry()) {
+                                entries.erase(entries.begin() + (index - 1));
+                        } else if (entry.is_wide_entry()) {
+                                entries.erase(entries.begin() + index);
+                        }
+                }
+        };
 }
 
 #endif
