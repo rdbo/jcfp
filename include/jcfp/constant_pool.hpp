@@ -199,8 +199,10 @@ namespace jcfp {
                 static std::expected<ConstantPoolEntry, Error> parse(BufReader &reader);
                 static std::expected<ConstantPoolEntry, Error> parse(u1 *bytes, size_t max_length=0);
 
+                std::string to_string();
+
                 template <typename T>
-                inline T get()
+                inline T &get()
                 {
                         return std::get<T>(this->info);
                 }

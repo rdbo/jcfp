@@ -15,6 +15,7 @@
 
  #include <jcfp/jcfp.hpp>
  #include <jcfp/utils.hpp>
+ #include <format>
 
 using namespace jcfp;
 
@@ -22,20 +23,29 @@ std::expected<ConstantPool, Error> ConstantPool::parse(BufReader &reader)
 {
         std::vector<ConstantPoolEntry> entries;
 
+        LOG("Parsing constant pool (offset: %ld)...\n", reader.pos());
+
         u2 constant_pool_count = reader.read_be<u2>();
-        if (constant_pool_count == 0)
+        if (constant_pool_count == 0) {
+                LOG("Empty constant pool\n");
                 return ConstantPool(entries);
+        }
 
         // The first entry is always an empty tag
         entries.push_back(ConstantPoolEntry());
 
         for (u2 i = 1; i < constant_pool_count - 1; ++i) {
                 auto result = ConstantPoolEntry::parse(reader);
-                if (!result.has_value())
+                if (!result.has_value()) {
+                        ERR("Failed to parse constant pool entry '%d'\n", i);
                         return std::unexpected(result.error());
+                }
 
+                LOG("New constant pool entry parsed (%d): %s\n", i, result.value().to_string().c_str());
                 entries.push_back(result.value());
         }
+
+        LOG("Constant pool parsed successfully (offset: %ld)\n", reader.pos());
 
         return ConstantPool(entries);
 }
@@ -196,4 +206,30 @@ std::expected<ConstantPool, Error> ConstantPool::parse(u1 *bytes, size_t max_len
         BufReader reader = BufReader(bytes, max_length);
 
         return ConstantPool::parse(reader);
+}
+
+std::string ConstantPoolEntry::to_string()
+{
+        using Tag = ConstantPoolEntry::Tag;
+        using EntryVariant = ConstantPoolEntry::EntryVariant;
+
+        std::string fmt;
+        switch(this->tag) {
+        case Tag::Empty: fmt = "Empty {}"; break;
+        case Tag::Class: fmt = std::format("Class {{ name_index: {} }}", this->get<ClassInfo>().name_index); break;
+        case Tag::Fieldref: fmt = std::format("Fieldref {{ class_index: {}, name_and_type_index: {} }}", this->get<FieldrefInfo>().class_index, this->get<FieldrefInfo>().name_and_type_index); break;
+        case Tag::Methodref: fmt = std::format("Methodref {{ class_index: {}, name_and_type_index: {} }}", this->get<MethodrefInfo>().class_index, this->get<MethodrefInfo>().name_and_type_index); break;
+        case Tag::InterfaceMethodref: fmt = std::format("InterfaceMethodref {{ class_index: {}, name_and_type_index: {} }}", this->get<InterfaceMethodrefInfo>().class_index, this->get<InterfaceMethodrefInfo>().name_and_type_index); break;
+        case Tag::String: fmt = std::format("String {{ string_index: {} }}", this->get<StringInfo>().string_index); break;
+        case Tag::Integer: fmt = std::format("Integer {{ bytes: {} }}", this->get<IntegerInfo>().bytes); break;
+        case Tag::Float: fmt = std::format("Float {{ bytes: {} }}", this->get<FloatInfo>().bytes); break;
+        case Tag::Long: fmt = std::format("Long {{ high_bytes: {:#x}, low_bytes: {:#x} }}", this->get<LongInfo>().high_bytes, this->get<LongInfo>().low_bytes); break;
+        case Tag::Double: fmt = std::format("Double {{ high_bytes: {:#x}, low_bytes: {:#x} }}", this->get<DoubleInfo>().high_bytes, this->get<DoubleInfo>().low_bytes); break;
+        case Tag::NameAndType: fmt = std::format("NameAndType {{ name_index: {}, descriptor_index: {} }}", this->get<NameAndTypeInfo>().name_index, this->get<NameAndTypeInfo>().descriptor_index); break;
+        case Tag::Utf8: fmt = std::format("Utf8 {{ bytes: \"{}\" }}", this->get<Utf8Info>().bytes); break;
+        case Tag::MethodHandle: fmt = std::format("MethodHandle {{ reference_kind: {}, reference_index: {} }}", this->get<MethodHandleInfo>().reference_kind, this->get<MethodHandleInfo>().reference_index); break;
+        case Tag::InvokeDynamic: fmt = std::format("InvokeDynamic {{ bootstrap_method_attr_index: {}, name_and_type_index: {} }}", this->get<InvokeDynamicInfo>().bootstrap_method_attr_index, this->get<InvokeDynamicInfo>().name_and_type_index); break;
+        default: fmt = "<Unknown (tag: " + std::to_string(this->tag) + ")>"; break;
+        }
+        return fmt;
 }

@@ -19,6 +19,14 @@
 #include "basetypes.hpp"
 #include <stdexcept>
 
+#ifdef DEBUG
+#       define LOG(fmt, ...) printf("[JCFP] " fmt, ##__VA_ARGS__)
+#       define ERR(fmt, ...) printf("[JCFP] [ERROR] " fmt, ##__VA_ARGS__)
+#else
+#       define LOG(fmt, ...)
+#       define ERR(fmt, ...)
+#endif
+
 namespace jcfp {
         class BufReader {
         private:
@@ -37,7 +45,7 @@ namespace jcfp {
                         if (this->max_length > 0 && next_offset > this->max_length) {
                                 throw std::out_of_range(
                                         "Attempted to read from " + std::to_string(offset) + " to " +
-                                        std::to_string(next_offset) + "(max offset: " + std::to_string(this->max_length) + ")"
+                                        std::to_string(next_offset) + " (max offset: " + std::to_string(this->max_length) + ")"
                                 );
                         }
 
