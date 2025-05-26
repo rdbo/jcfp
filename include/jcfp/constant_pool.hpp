@@ -276,6 +276,8 @@ namespace jcfp {
                                 entries.insert(entries.begin() + index, ConstantPoolEntry());
 
                         entries.insert(entries.begin() + index, entry);
+
+                        // TODO: Relocate indices
                 }
 
                 inline void remove_entry(u2 index)
@@ -289,6 +291,16 @@ namespace jcfp {
                         } else if (entry.is_wide_entry()) {
                                 entries.erase(entries.begin() + index);
                         }
+
+                        // TODO: Relocate indices
+                }
+
+
+                inline void replace_entry(u2 index, ConstantPoolEntry entry)
+                {
+                        entries[index] = entry;
+                        if (entry.is_wide_entry())
+                                this->insert_entry(index + 1, ConstantPoolEntry());
                 }
         };
 }
