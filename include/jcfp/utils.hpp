@@ -114,7 +114,10 @@ namespace jcfp {
                 template <typename T>
                 inline void write(const T &value)
                 {
-                        this->write_bytes(&value, &value + 1);
+                        this->write_bytes(
+                                reinterpret_cast<const u1 *>(&value),
+                                sizeof(T)
+                        );
                 }
 
                 template <typename T>

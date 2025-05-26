@@ -35,7 +35,17 @@ int main()
         std::vector<u1> encoded = cf.encode();
         std::cout << "Encoded CF size: " << encoded.size() << std::endl;
         std::cout << "Original size: " << size << std::endl;
-        std::cout << "CF Verify: " << (encoded == std::vector<u1>(buf, buf + size) ? "OK" : "BAD") << std::endl;
+
+        bool verify = encoded == std::vector<u1>(buf, buf + size);
+        std::cout << "CF Verify: " << (verify ? "OK" : "BAD") << std::endl;
+
+        if (!verify) {
+                std::cout << std::endl << std::endl << std::endl <<
+                             "Reparsing class to identify issues through logs..." <<
+                             std::endl << std::endl << std::endl;
+
+                ClassFile::parse(encoded);
+        }
 
         return 0;
 }

@@ -151,7 +151,7 @@ std::vector<u1> ClassFile::encode()
                 stream.write_be(interface);
         }
 
-        // stream.write_bytes(this->constant_pool.encode());
+        stream.write_bytes(this->constant_pool.encode());
 
         // TODO: Abstract attribute handling into a helper
 

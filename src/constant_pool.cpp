@@ -195,17 +195,126 @@ std::expected<ConstantPoolEntry, Error> ConstantPoolEntry::parse(BufReader &read
 }
 
 
-std::expected<ConstantPoolEntry, Error> ConstantPoolEntry::parse(u1 *bytes, size_t max_length)
+std::expected<ConstantPoolEntry, Error> ConstantPoolEntry::parse(const u1 *bytes, size_t max_length)
 {
         BufReader reader = BufReader(bytes, max_length);
         return ConstantPoolEntry::parse(reader);
 }
 
-std::expected<ConstantPool, Error> ConstantPool::parse(u1 *bytes, size_t max_length)
+std::expected<ConstantPool, Error> ConstantPool::parse(const u1 *bytes, size_t max_length)
 {
         BufReader reader = BufReader(bytes, max_length);
 
         return ConstantPool::parse(reader);
+}
+
+std::vector<u1> ConstantPool::encode()
+{
+        ByteStream stream = ByteStream();
+
+        u2 constant_pool_count = this->count();
+        stream.write_be(constant_pool_count);
+
+        for (auto &entry : this->entries) {
+                stream.write_bytes(entry.encode());
+        }
+
+        return stream.collect();        
+}
+
+std::vector<u1> ConstantPoolEntry::encode()
+{
+        ByteStream stream = ByteStream();
+
+        stream.write_be(this->tag);
+
+        switch (this->tag) {                
+        case Tag::Empty:
+                break;
+        case Tag::Class: {
+                ClassInfo info = this->get<ClassInfo>();
+                stream.write_be(info.name_index);
+                break;
+        }
+        case Tag::Fieldref: {
+                FieldrefInfo info = this->get<FieldrefInfo>();
+                stream.write_be(info.class_index);
+                stream.write_be(info.name_and_type_index);
+                break;
+        }
+        case Tag::Methodref: {
+                MethodrefInfo info = this->get<MethodrefInfo>();
+                stream.write_be(info.class_index);
+                stream.write_be(info.name_and_type_index);
+                break;
+        }
+        case Tag::InterfaceMethodref: {
+                InterfaceMethodrefInfo info = this->get<InterfaceMethodrefInfo>();
+                stream.write_be(info.class_index);
+                stream.write_be(info.name_and_type_index);
+                break;
+        }
+        case Tag::String: {
+                StringInfo info = this->get<StringInfo>();
+                stream.write_be(info.string_index);
+                break;
+        }
+        case Tag::Integer: {
+                IntegerInfo info = this->get<IntegerInfo>();
+                stream.write_be(info.bytes);
+                break;
+        }
+        case Tag::Float: {
+                FloatInfo info = this->get<FloatInfo>();
+                stream.write_be(info.bytes);
+                break;
+        }
+        case Tag::Long: {
+                LongInfo info = this->get<LongInfo>();
+                stream.write_be(info.high_bytes);
+                stream.write_be(info.low_bytes);
+                break;
+        }
+        case Tag::Double: {
+                DoubleInfo info = this->get<DoubleInfo>();
+                stream.write_be(info.high_bytes);
+                stream.write_be(info.low_bytes);
+                break;
+        }
+        case Tag::NameAndType: {
+                NameAndTypeInfo info = this->get<NameAndTypeInfo>();
+                stream.write_be(info.name_index);
+                stream.write_be(info.descriptor_index);
+                break;
+        }
+        case Tag::Utf8: {
+                Utf8Info info = this->get<Utf8Info>();
+                for (char b : info.bytes) {
+                        stream.write(b);
+                }
+                break;
+        }
+        case Tag::MethodHandle: {
+                MethodHandleInfo info = this->get<MethodHandleInfo>();
+                stream.write_be(info.reference_kind);
+                stream.write_be(info.reference_index);
+                break;
+        }
+        case Tag::MethodType: {
+                MethodTypeInfo info = this->get<MethodTypeInfo>();
+                stream.write_be(info.descriptor_index);
+                break;
+        }
+        case Tag::InvokeDynamic: {
+                InvokeDynamicInfo info = this->get<InvokeDynamicInfo>();
+                break;
+        }
+        default:
+                ERR("Failed to encode tag '%u' (unknown)", this->tag);
+                break;
+        }
+
+        return stream.collect();
 }
 
 std::string ConstantPoolEntry::to_string()
@@ -228,6 +337,7 @@ std::string ConstantPoolEntry::to_string()
         case Tag::NameAndType: fmt = std::format("NameAndType {{ name_index: {}, descriptor_index: {} }}", this->get<NameAndTypeInfo>().name_index, this->get<NameAndTypeInfo>().descriptor_index); break;
         case Tag::Utf8: fmt = std::format("Utf8 {{ bytes: \"{}\" }}", this->get<Utf8Info>().bytes); break;
         case Tag::MethodHandle: fmt = std::format("MethodHandle {{ reference_kind: {}, reference_index: {} }}", this->get<MethodHandleInfo>().reference_kind, this->get<MethodHandleInfo>().reference_index); break;
+        case Tag::MethodType: fmt = std::format("MethodType {{ descriptor_index: {} }}", this->get<MethodTypeInfo>().descriptor_index); break;
         case Tag::InvokeDynamic: fmt = std::format("InvokeDynamic {{ bootstrap_method_attr_index: {}, name_and_type_index: {} }}", this->get<InvokeDynamicInfo>().bootstrap_method_attr_index, this->get<InvokeDynamicInfo>().name_and_type_index); break;
         default: fmt = "<Unknown (tag: " + std::to_string(this->tag) + ")>"; break;
         }
