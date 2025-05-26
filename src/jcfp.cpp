@@ -136,9 +136,72 @@ std::vector<u1> ClassFile::encode()
 {
         ByteStream stream = ByteStream();
 
+        LOG("Encoding ClassFile to bytes...");
+
         stream.write_be(this->magic);
         stream.write_be(this->minor_version);
         stream.write_be(this->major_version);
+        stream.write_be(this->access_flags);
+        stream.write_be(this->this_class);
+        stream.write_be(this->super_class);
+
+        u2 interfaces_count = static_cast<u2>(this->interfaces.size());
+        stream.write_be(interfaces_count);
+        for (auto &interface : this->interfaces) {
+                stream.write_be(interface);
+        }
+
+        // stream.write_bytes(this->constant_pool.encode());
+
+        // TODO: Abstract attribute handling into a helper
+
+        u2 fields_count = static_cast<u2>(this->fields.size());
+        stream.write_be(fields_count);
+        for (auto &field : this->fields) {
+                stream.write_be(field.access_flags);
+                stream.write_be(field.name_index);
+                stream.write_be(field.descriptor_index);
+
+                u2 attributes_count = static_cast<u2>(field.attributes.size());
+                stream.write_be(attributes_count);
+                for (auto &attribute : field.attributes) {
+                        stream.write_be(attribute.attribute_name_index);
+
+                        u2 attribute_length = attribute.info.size();
+                        stream.write_be(attribute_length);
+                        stream.write_bytes(attribute.info);
+                }
+        }
+
+        u2 methods_count = static_cast<u2>(this->methods.size());
+        stream.write_be(methods_count);
+        for (auto &method : this->methods) {
+                stream.write_be(method.access_flags);
+                stream.write_be(method.name_index);
+                stream.write_be(method.descriptor_index);
+
+                u2 attributes_count = static_cast<u2>(method.attributes.size());
+                stream.write_be(attributes_count);
+                for (auto &attribute : method.attributes) {
+                        stream.write_be(attribute.attribute_name_index);
+
+                        u2 attribute_length = attribute.info.size();
+                        stream.write_be(attribute_length);
+                        stream.write_bytes(attribute.info);
+                }
+        }
+
+        u2 attributes_count = static_cast<u2>(this->attributes.size());
+        stream.write_be(attributes_count);
+        for (auto &attribute : this->attributes) {
+                stream.write_be(attribute.attribute_name_index);
+
+                u2 attribute_length = attribute.info.size();
+                stream.write_be(attribute_length);
+                stream.write_bytes(attribute.info);
+        }
+
+        LOG("ClassFile encoding finished successfully");
 
         return stream.collect();
 }
