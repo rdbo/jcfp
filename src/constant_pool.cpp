@@ -18,6 +18,8 @@
  #include <format>
 
 using namespace jcfp;
+using Tag = ConstantPoolEntry::Tag;
+using EntryVariant = ConstantPoolEntry::EntryVariant;
 
 std::expected<ConstantPool, Error> ConstantPool::parse(BufReader &reader)
 {
@@ -43,7 +45,25 @@ std::expected<ConstantPool, Error> ConstantPool::parse(BufReader &reader)
                 }
 
                 LOG("New constant pool entry parsed (%hu): %s", i, result.value().to_string().c_str());
-                entries.push_back(result.value());
+
+                auto entry = result.value();
+                entries.push_back(entry);
+
+                /* From: https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html
+                 * """
+                 * All 8-byte constants take up two entries in the constant_pool table of the
+                 * class file. If a CONSTANT_Long_info or CONSTANT_Double_info structure is the
+                 * item in the constant_pool table at index n, then the next usable item in the
+                 * pool is located at index n+2. The constant_pool index n+1 must be valid but
+                 * is considered unusable.
+                 *
+                 * In retrospect, making 8-byte constants take two constant pool entries was a poor choice.
+                 * """
+                 */
+                if (entry.tag == Tag::Long || entry.tag == Tag::Double) {
+                        entries.push_back(ConstantPoolEntry());
+                        ++i;
+                }
         }
 
         LOG("Constant pool parsed successfully (offset: %lu, entries: %lu)", reader.pos(), entries.size());
@@ -53,9 +73,6 @@ std::expected<ConstantPool, Error> ConstantPool::parse(BufReader &reader)
 
 std::expected<ConstantPoolEntry, Error> ConstantPoolEntry::parse(BufReader &reader)
 {
-        using Tag = ConstantPoolEntry::Tag;
-        using EntryVariant = ConstantPoolEntry::EntryVariant;
-
         u1 tag = reader.read<u1>();
         EntryVariant info;
 
@@ -216,8 +233,8 @@ std::vector<u1> ConstantPool::encode()
         u2 constant_pool_count = this->count();
         stream.write_be(constant_pool_count);
 
-        for (size_t i = 1; i < this->entries.size(); ++i) {
-                stream.write_bytes(this->entries[i].encode());
+        for (auto &entry : this->entries) {
+                stream.write_bytes(entry.encode());
         }
 
         return stream.collect();        
@@ -227,11 +244,12 @@ std::vector<u1> ConstantPoolEntry::encode()
 {
         ByteStream stream = ByteStream();
 
+        if (this->tag == Tag::Empty)
+                return stream.collect();
+
         stream.write_be(this->tag);
 
         switch (this->tag) {
-        case Tag::Empty:
-                break;
         case Tag::Class: {
                 ClassInfo info = this->get<ClassInfo>();
                 stream.write_be(info.name_index);
