@@ -151,7 +151,9 @@ std::vector<u1> ClassFile::encode()
                 stream.write_be(interface);
         }
 
-        stream.write_bytes(this->constant_pool.encode());
+        std::vector<u1> encoded_constant_pool = constant_pool.encode();
+        LOG("Encoded constant pool size: %lu", encoded_constant_pool.size());
+        stream.write_bytes(encoded_constant_pool);
 
         // TODO: Abstract attribute handling into a helper
 

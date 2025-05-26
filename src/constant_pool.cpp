@@ -30,6 +30,7 @@ std::expected<ConstantPool, Error> ConstantPool::parse(BufReader &reader)
                 LOG("Empty constant pool");
                 return ConstantPool(entries);
         }
+        LOG("Constant pool count: %hu", constant_pool_count);
 
         // The first entry is always an empty tag
         entries.push_back(ConstantPoolEntry());
@@ -45,7 +46,7 @@ std::expected<ConstantPool, Error> ConstantPool::parse(BufReader &reader)
                 entries.push_back(result.value());
         }
 
-        LOG("Constant pool parsed successfully (offset: %lu)", reader.pos());
+        LOG("Constant pool parsed successfully (offset: %lu, entries: %lu)", reader.pos(), entries.size());
 
         return ConstantPool(entries);
 }
@@ -307,6 +308,9 @@ std::vector<u1> ConstantPoolEntry::encode()
         }
         case Tag::InvokeDynamic: {
                 InvokeDynamicInfo info = this->get<InvokeDynamicInfo>();
+                stream.write_be(info.bootstrap_method_attr_index);
+                stream.write_be(info.name_and_type_index);
+
                 break;
         }
         default:
