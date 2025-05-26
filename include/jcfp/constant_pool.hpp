@@ -232,14 +232,10 @@ namespace jcfp {
                  *
                  *     cp_info constant_pool[constant_pool_count-1];
                  *
-                 * Which means that `constant_pool_count = total_entries + 1`
-                 * This information is required for writing the ClassFile back
-                 * into bytes
-                 *
                  * Iteration goes from 1 to count - 1
                  */
                 inline u2 count() {
-                        return entries.size() + 1;
+                        return entries.size();
                 }
 
                 /* Helper functions */

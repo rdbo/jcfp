@@ -1,5 +1,6 @@
 #include <jcfp/jcfp.hpp>
 #include <iostream>
+#include <algorithm>
 
 using namespace jcfp;
 
@@ -13,7 +14,7 @@ int main()
                 return -1;
         }
         fread(buf, sizeof(buf), 1, f);
-        size = ftell(f) + 1;
+        size = ftell(f);
         fclose(f);
 
         auto result = ClassFile::parse(buf, size);
@@ -40,8 +41,20 @@ int main()
         std::cout << "CF Verify: " << (verify ? "OK" : "BAD") << std::endl;
 
         if (!verify) {
+                f = fopen("Encoded.class", "w");
+                fwrite(encoded.data(), 1, encoded.size(), f);
+                fclose(f);
+                std::cout << "Bad class dumped to 'Encoded.class'" << std::endl;
+
+                for (size_t i = 0; i < std::min(encoded.size(), size); ++i) {
+                        if (encoded[i] != buf[i]) {
+                                std::cout << "Mismatch at offset: " << (void *)i << std::endl;
+                                break;
+                        }
+                }
+
                 std::cout << std::endl << std::endl << std::endl <<
-                             "Reparsing class to identify issues through logs..." <<
+                             "Reparsing class to identify issues..." <<
                              std::endl << std::endl << std::endl;
 
                 ClassFile::parse(encoded);

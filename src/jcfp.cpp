@@ -141,22 +141,26 @@ std::vector<u1> ClassFile::encode()
         stream.write_be(this->magic);
         stream.write_be(this->minor_version);
         stream.write_be(this->major_version);
+
+        LOG("Encoding constant pool at offset: %lx", stream.size());
+        std::vector<u1> encoded_constant_pool = constant_pool.encode();
+        stream.write_bytes(encoded_constant_pool);
+        LOG("Encoded constant pool size: %lu", encoded_constant_pool.size());
+
         stream.write_be(this->access_flags);
         stream.write_be(this->this_class);
         stream.write_be(this->super_class);
 
+        LOG("Encoding interfaces at offset: %lx", stream.size());
         u2 interfaces_count = static_cast<u2>(this->interfaces.size());
         stream.write_be(interfaces_count);
         for (auto &interface : this->interfaces) {
                 stream.write_be(interface);
         }
 
-        std::vector<u1> encoded_constant_pool = constant_pool.encode();
-        LOG("Encoded constant pool size: %lu", encoded_constant_pool.size());
-        stream.write_bytes(encoded_constant_pool);
-
         // TODO: Abstract attribute handling into a helper
 
+        LOG("Encoding fields at offset: %lx", stream.size());
         u2 fields_count = static_cast<u2>(this->fields.size());
         stream.write_be(fields_count);
         for (auto &field : this->fields) {
@@ -169,12 +173,13 @@ std::vector<u1> ClassFile::encode()
                 for (auto &attribute : field.attributes) {
                         stream.write_be(attribute.attribute_name_index);
 
-                        u2 attribute_length = attribute.info.size();
+                        u4 attribute_length = attribute.info.size();
                         stream.write_be(attribute_length);
                         stream.write_bytes(attribute.info);
                 }
         }
 
+        LOG("Encoding methods at offset: %lx", stream.size());
         u2 methods_count = static_cast<u2>(this->methods.size());
         stream.write_be(methods_count);
         for (auto &method : this->methods) {
@@ -187,18 +192,19 @@ std::vector<u1> ClassFile::encode()
                 for (auto &attribute : method.attributes) {
                         stream.write_be(attribute.attribute_name_index);
 
-                        u2 attribute_length = attribute.info.size();
+                        u4 attribute_length = attribute.info.size();
                         stream.write_be(attribute_length);
                         stream.write_bytes(attribute.info);
                 }
         }
 
+        LOG("Encoding attributes at offset: %lx", stream.size());
         u2 attributes_count = static_cast<u2>(this->attributes.size());
         stream.write_be(attributes_count);
         for (auto &attribute : this->attributes) {
                 stream.write_be(attribute.attribute_name_index);
 
-                u2 attribute_length = attribute.info.size();
+                u4 attribute_length = attribute.info.size();
                 stream.write_be(attribute_length);
                 stream.write_bytes(attribute.info);
         }

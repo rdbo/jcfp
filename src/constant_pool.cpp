@@ -216,8 +216,8 @@ std::vector<u1> ConstantPool::encode()
         u2 constant_pool_count = this->count();
         stream.write_be(constant_pool_count);
 
-        for (auto &entry : this->entries) {
-                stream.write_bytes(entry.encode());
+        for (size_t i = 1; i < this->entries.size(); ++i) {
+                stream.write_bytes(this->entries[i].encode());
         }
 
         return stream.collect();        
@@ -229,7 +229,7 @@ std::vector<u1> ConstantPoolEntry::encode()
 
         stream.write_be(this->tag);
 
-        switch (this->tag) {                
+        switch (this->tag) {
         case Tag::Empty:
                 break;
         case Tag::Class: {
@@ -290,6 +290,9 @@ std::vector<u1> ConstantPoolEntry::encode()
         }
         case Tag::Utf8: {
                 Utf8Info info = this->get<Utf8Info>();
+
+                u2 length = info.bytes.size();
+                stream.write_be(length);
                 for (char b : info.bytes) {
                         stream.write(b);
                 }

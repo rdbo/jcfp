@@ -130,6 +130,11 @@ namespace jcfp {
 
                         this->write_bytes(buf, sizeof(buf));
                 }
+
+                inline size_t size()
+                {
+                        return this->bytes.size();
+                }
         };
 }
 
