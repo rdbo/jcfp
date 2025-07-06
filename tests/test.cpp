@@ -17,6 +17,7 @@ int main()
         size = ftell(f);
         fclose(f);
 
+        std::cout << "Standard test";
         auto result = ClassFile::parse(buf, size);
         if (!result.has_value()) {
                 std::cerr << "Failed to parse ClassFile: " << static_cast<int>(result.error().kind) << " @ " << result.error().offset << std::endl;
@@ -58,6 +59,68 @@ int main()
                              std::endl << std::endl << std::endl;
 
                 ClassFile::parse(encoded);
+                return 1;
+        }
+
+        std::cout << std::endl;
+
+        std::cout << "Constant pool test" << std::endl;
+        auto entry = cf.constant_pool.remove_entry(2);
+        cf.constant_pool.insert_entry(2, entry);
+        encoded = cf.encode();
+        verify = encoded == std::vector<u1>(buf, buf + size);
+        std::cout << "CF Verify: " << (verify ? "OK" : "BAD") << std::endl;
+        if (!verify) {
+                f = fopen("Encoded.class", "w");
+                fwrite(encoded.data(), 1, encoded.size(), f);
+                fclose(f);
+                std::cout << "Bad class dumped to 'Encoded.class'" << std::endl;
+
+                for (size_t i = 0; i < std::min(encoded.size(), size); ++i) {
+                        if (encoded[i] != buf[i]) {
+                                std::cout << "Mismatch at offset: " << (void *)i << std::endl;
+                                break;
+                        }
+                }
+
+                std::cout << std::endl << std::endl << std::endl <<
+                             "Reparsing class to identify issues..." <<
+                             std::endl << std::endl << std::endl;
+
+                ClassFile::parse(encoded);
+                return 1;
+        }
+
+
+        std::cout << std::endl;
+
+        std::cout << "Constant pool relocation test" << std::endl;
+        cf.constant_pool.insert_entry(2, entry);
+        cf.constant_pool.relocate(+1, 2);
+        cf.constant_pool.remove_entry(2);
+        cf.constant_pool.relocate(-1, 2);
+        encoded = cf.encode();
+        verify = encoded == std::vector<u1>(buf, buf + size);
+        std::cout << "CF Verify: " << (verify ? "OK" : "BAD") << std::endl;
+        if (!verify) {
+                f = fopen("Encoded.class", "w");
+                fwrite(encoded.data(), 1, encoded.size(), f);
+                fclose(f);
+                std::cout << "Bad class dumped to 'Encoded.class'" << std::endl;
+
+                for (size_t i = 0; i < std::min(encoded.size(), size); ++i) {
+                        if (encoded[i] != buf[i]) {
+                                std::cout << "Mismatch at offset: " << (void *)i << std::endl;
+                                break;
+                        }
+                }
+
+                std::cout << std::endl << std::endl << std::endl <<
+                             "Reparsing class to identify issues..." <<
+                             std::endl << std::endl << std::endl;
+
+                ClassFile::parse(encoded);
+                return 1;
         }
 
         return 0;

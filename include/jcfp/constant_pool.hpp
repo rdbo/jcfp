@@ -212,6 +212,7 @@ namespace jcfp {
                 {
                         return tag == Tag::Double || tag == Tag::Long;
                 }
+                void relocate(int diff, u2 from);
         };
 
         class ConstantPool {
@@ -272,36 +273,52 @@ namespace jcfp {
 
                 inline void insert_entry(u2 index, ConstantPoolEntry entry)
                 {
+                        // Relocate references to indices >= index
+                        // int diff = entry.is_wide_entry() ? +2 : +1;
+                        // this->relocate(diff, index);
+
+                        // Insert entry
                         if (entry.is_wide_entry())
                                 entries.insert(entries.begin() + index, ConstantPoolEntry());
-
                         entries.insert(entries.begin() + index, entry);
-
-                        // TODO: Relocate indices
                 }
 
-                inline void remove_entry(u2 index)
+                // WARN: If anyone is referencing the entry you removed,
+                //       you will get a bad relocation. Use 'replace_entry'
+                //       with the same entry type if you wanna avoid such issues.
+                inline ConstantPoolEntry remove_entry(u2 index)
                 {
-                        ConstantPoolEntry entry = entries[index];
+                        if (index > 1 && entries[index - 1].is_wide_entry())
+                                --index;
 
+                        // Relocate references to indices >= index
+                        ConstantPoolEntry entry = entries[index];
+                        // int diff = entry.is_wide_entry() ? -2 : -1;
+                        // this->relocate(diff, index);
+
+                        // Remove entry
                         entries.erase(entries.begin() + index);
-                        
-                        if (index > 1 && entries[index - 1].is_wide_entry()) {
-                                entries.erase(entries.begin() + (index - 1));
-                        } else if (entry.is_wide_entry()) {
+                        if (entry.is_wide_entry()) {
                                 entries.erase(entries.begin() + index);
                         }
 
-                        // TODO: Relocate indices
+                        return entry;
                 }
 
 
-                inline void replace_entry(u2 index, ConstantPoolEntry entry)
+                inline ConstantPoolEntry replace_entry(u2 index, ConstantPoolEntry entry)
                 {
+                        auto old_entry = entries[index];
                         entries[index] = entry;
-                        if (entry.is_wide_entry())
+                        if (entry.is_wide_entry() && !old_entry.is_wide_entry())
                                 this->insert_entry(index + 1, ConstantPoolEntry());
+                        else if (old_entry.is_wide_entry())
+                                this->remove_entry(index + 1); // Remove empty pool entry
+
+                        return old_entry;
                 }
+
+                void relocate(int diff, u2 from);
         };
 }
 

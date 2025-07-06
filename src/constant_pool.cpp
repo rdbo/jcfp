@@ -251,63 +251,63 @@ std::vector<u1> ConstantPoolEntry::encode()
 
         switch (this->tag) {
         case Tag::Class: {
-                ClassInfo info = this->get<ClassInfo>();
+                ClassInfo &info = this->get<ClassInfo>();
                 stream.write_be(info.name_index);
                 break;
         }
         case Tag::Fieldref: {
-                FieldrefInfo info = this->get<FieldrefInfo>();
+                FieldrefInfo &info = this->get<FieldrefInfo>();
                 stream.write_be(info.class_index);
                 stream.write_be(info.name_and_type_index);
                 break;
         }
         case Tag::Methodref: {
-                MethodrefInfo info = this->get<MethodrefInfo>();
+                MethodrefInfo &info = this->get<MethodrefInfo>();
                 stream.write_be(info.class_index);
                 stream.write_be(info.name_and_type_index);
                 break;
         }
         case Tag::InterfaceMethodref: {
-                InterfaceMethodrefInfo info = this->get<InterfaceMethodrefInfo>();
+                InterfaceMethodrefInfo &info = this->get<InterfaceMethodrefInfo>();
                 stream.write_be(info.class_index);
                 stream.write_be(info.name_and_type_index);
                 break;
         }
         case Tag::String: {
-                StringInfo info = this->get<StringInfo>();
+                StringInfo &info = this->get<StringInfo>();
                 stream.write_be(info.string_index);
                 break;
         }
         case Tag::Integer: {
-                IntegerInfo info = this->get<IntegerInfo>();
+                IntegerInfo &info = this->get<IntegerInfo>();
                 stream.write_be(info.bytes);
                 break;
         }
         case Tag::Float: {
-                FloatInfo info = this->get<FloatInfo>();
+                FloatInfo &info = this->get<FloatInfo>();
                 stream.write_be(info.bytes);
                 break;
         }
         case Tag::Long: {
-                LongInfo info = this->get<LongInfo>();
+                LongInfo &info = this->get<LongInfo>();
                 stream.write_be(info.high_bytes);
                 stream.write_be(info.low_bytes);
                 break;
         }
         case Tag::Double: {
-                DoubleInfo info = this->get<DoubleInfo>();
+                DoubleInfo &info = this->get<DoubleInfo>();
                 stream.write_be(info.high_bytes);
                 stream.write_be(info.low_bytes);
                 break;
         }
         case Tag::NameAndType: {
-                NameAndTypeInfo info = this->get<NameAndTypeInfo>();
+                NameAndTypeInfo &info = this->get<NameAndTypeInfo>();
                 stream.write_be(info.name_index);
                 stream.write_be(info.descriptor_index);
                 break;
         }
         case Tag::Utf8: {
-                Utf8Info info = this->get<Utf8Info>();
+                Utf8Info &info = this->get<Utf8Info>();
 
                 u2 length = info.bytes.size();
                 stream.write_be(length);
@@ -317,18 +317,18 @@ std::vector<u1> ConstantPoolEntry::encode()
                 break;
         }
         case Tag::MethodHandle: {
-                MethodHandleInfo info = this->get<MethodHandleInfo>();
+                MethodHandleInfo &info = this->get<MethodHandleInfo>();
                 stream.write_be(info.reference_kind);
                 stream.write_be(info.reference_index);
                 break;
         }
         case Tag::MethodType: {
-                MethodTypeInfo info = this->get<MethodTypeInfo>();
+                MethodTypeInfo &info = this->get<MethodTypeInfo>();
                 stream.write_be(info.descriptor_index);
                 break;
         }
         case Tag::InvokeDynamic: {
-                InvokeDynamicInfo info = this->get<InvokeDynamicInfo>();
+                InvokeDynamicInfo &info = this->get<InvokeDynamicInfo>();
                 stream.write_be(info.bootstrap_method_attr_index);
                 stream.write_be(info.name_and_type_index);
 
@@ -340,6 +340,81 @@ std::vector<u1> ConstantPoolEntry::encode()
         }
 
         return stream.collect();
+}
+
+void ConstantPool::relocate(int diff, u2 from)
+{
+        for (auto &entry : this->get_entries()) {
+                entry.relocate(diff, from);
+        }
+}
+
+#define PATCH_INDEX(index, diff, from) { if (index >= from) index += diff; }
+
+void ConstantPoolEntry::relocate(int diff, u2 from)
+{
+        switch (this->tag) {
+        case Tag::Empty:
+        case Tag::Integer:
+        case Tag::Float:
+        case Tag::Long:
+        case Tag::Double:
+        case Tag::Utf8:
+                break;
+        case Tag::Class: {
+                ClassInfo &info = this->get<ClassInfo>();
+                PATCH_INDEX(info.name_index, diff, from);
+                break;
+        }
+        case Tag::Fieldref: {
+                FieldrefInfo &info = this->get<FieldrefInfo>();
+                PATCH_INDEX(info.class_index, diff, from);
+                PATCH_INDEX(info.name_and_type_index, diff, from);
+                break;
+        }
+        case Tag::Methodref: {
+                MethodrefInfo &info = this->get<MethodrefInfo>();
+                PATCH_INDEX(info.class_index, diff, from);
+                PATCH_INDEX(info.name_and_type_index, diff, from);
+                break;
+        }
+        case Tag::InterfaceMethodref: {
+                InterfaceMethodrefInfo &info = this->get<InterfaceMethodrefInfo>();
+                PATCH_INDEX(info.class_index, diff, from);
+                PATCH_INDEX(info.name_and_type_index, diff, from);
+                break;
+        }
+        case Tag::String: {
+                StringInfo &info = this->get<StringInfo>();
+                PATCH_INDEX(info.string_index, diff, from);
+                break;
+        }
+        case Tag::NameAndType: {
+                NameAndTypeInfo &info = this->get<NameAndTypeInfo>();
+                PATCH_INDEX(info.name_index, diff, from);
+                PATCH_INDEX(info.descriptor_index, diff, from);
+                break;
+        }
+        case Tag::MethodHandle: {
+                MethodHandleInfo &info = this->get<MethodHandleInfo>();
+                PATCH_INDEX(info.reference_index, diff, from);
+                break;
+        }
+        case Tag::MethodType: {
+                MethodTypeInfo &info = this->get<MethodTypeInfo>();
+                PATCH_INDEX(info.descriptor_index, diff, from);
+                break;
+        }
+        case Tag::InvokeDynamic: {
+                InvokeDynamicInfo &info = this->get<InvokeDynamicInfo>();
+                PATCH_INDEX(info.bootstrap_method_attr_index, diff, from);
+                PATCH_INDEX(info.name_and_type_index, diff, from);
+                break;
+        }
+        default:
+                ERR("Failed to relocate tag '%u' (unknown)", this->tag);
+                break;
+        }
 }
 
 std::string ConstantPoolEntry::to_string()
