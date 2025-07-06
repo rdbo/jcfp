@@ -18,6 +18,7 @@
 
 #include <vector>
 #include <expected>
+#include <optional>
 #include "basetypes.hpp"
 #include "constant_pool.hpp"
 #include "error.hpp"
@@ -95,6 +96,28 @@ namespace jcfp {
                 static inline std::expected<ClassFile, Error> parse(const std::vector<u1> &bytes) { return parse(bytes.data(), bytes.size()); }
                 static inline std::expected<ClassFile, Error> parse(const u1 *bytes) { return parse(bytes, 0); }
                 std::vector<u1> encode();
+        public:
+                inline std::vector<std::string> get_attribute_names()
+                {
+                        std::vector<std::string> attrs;
+                        for (auto &attr : attributes) {
+                                auto &cpi = constant_pool.get<ConstantPoolEntry::Utf8Info>(attr.attribute_name_index);
+                                attrs.push_back(cpi.bytes);
+                        }
+
+                        return attrs;
+                }
+
+                inline std::optional<AttributeInfo> find_attribute(const std::string &name)
+                {
+                        for (auto &attr : attributes) {
+                                auto &cpi = constant_pool.get<ConstantPoolEntry::Utf8Info>(attr.attribute_name_index);
+                                if (cpi.bytes == name)
+                                       return attr;
+                        }
+
+                        return {};
+                }
         };
 }
 

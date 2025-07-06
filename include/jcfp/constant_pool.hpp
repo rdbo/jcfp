@@ -252,6 +252,12 @@ namespace jcfp {
                         return this->entries;
                 }
 
+                template <typename T>
+                inline T &get(u2 index)
+                {
+                        return entries[index].get<T>();
+                }
+
                 inline void push_entry(ConstantPoolEntry entry) {
                         entries.push_back(entry);
                         if (entry.is_wide_entry()) {
@@ -310,10 +316,13 @@ namespace jcfp {
                 {
                         auto old_entry = entries[index];
                         entries[index] = entry;
-                        if (entry.is_wide_entry() && !old_entry.is_wide_entry())
+                        if (entry.is_wide_entry() && !old_entry.is_wide_entry()) {
                                 this->insert_entry(index + 1, ConstantPoolEntry());
-                        else if (old_entry.is_wide_entry())
+                                this->relocate(+1, index + 1);
+                        } else if (old_entry.is_wide_entry()) {
                                 this->remove_entry(index + 1); // Remove empty pool entry
+                                this->relocate(-1, index + 1);
+                        }
 
                         return old_entry;
                 }

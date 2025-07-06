@@ -123,5 +123,13 @@ int main()
                 return 1;
         }
 
+        std::cout << std::endl;
+        std::cout << "Attributes" << std::endl;
+        for (auto attr : cf.get_attribute_names()) {
+                std::cout << " - " << attr << std::endl;
+        }
+
+        std::cout << "SourceFile length: " << cf.find_attribute("SourceFile").value().info.size() << std::endl;
+
         return 0;
 }
