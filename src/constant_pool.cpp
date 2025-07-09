@@ -13,9 +13,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
- #include <jcfp/jcfp.hpp>
- #include <jcfp/utils.hpp>
- #include <format>
+#include <jcfp/jcfp.hpp>
+#include <jcfp/utils.hpp>
+#include <format>
 
 using namespace jcfp;
 using Tag = ConstantPoolEntry::Tag;

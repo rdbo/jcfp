@@ -73,13 +73,7 @@ std::expected<ClassFile, Error> ClassFile::parse(const u1 *bytes, size_t max_len
 		std::vector<AttributeInfo> attributes;
 		u2 attributes_count = reader.read_be<u2>();
 		for (u2 j = 0; j < attributes_count; ++j) {
-			u2 attribute_name_index = reader.read_be<u2>();
-			u4 attribute_length = reader.read_be<u4>();
-			std::vector<u1> info = reader.read_bytes(attribute_length);
-			attributes.push_back(AttributeInfo {
-				attribute_name_index,
-				std::move(info)
-			});
+			attributes.push_back(AttributeInfo::parse(reader));
 		}
 
 		fields.push_back(FieldInfo {
@@ -98,13 +92,7 @@ std::expected<ClassFile, Error> ClassFile::parse(const u1 *bytes, size_t max_len
 		std::vector<AttributeInfo> attributes;
 		u2 attributes_count = reader.read_be<u2>();
 		for (u2 j = 0; j < attributes_count; ++j) {
-			u2 attribute_name_index = reader.read_be<u2>();
-			u4 attribute_length = reader.read_be<u4>();
-			std::vector<u1> info = reader.read_bytes(attribute_length);
-			attributes.push_back(AttributeInfo {
-				attribute_name_index,
-				std::move(info)
-			});
+			attributes.push_back(AttributeInfo::parse(reader));
 		}
 
 		methods.push_back(MethodInfo {
@@ -116,13 +104,7 @@ std::expected<ClassFile, Error> ClassFile::parse(const u1 *bytes, size_t max_len
 	u2 attributes_count = reader.read_be<u2>();
 	LOG("Attributes count: %hu", attributes_count);
 	for (u2 i = 0; i < attributes_count; ++i) {
-		u2 attribute_name_index = reader.read_be<u2>();
-		u4 attribute_length = reader.read_be<u4>();
-		std::vector<u1> info = reader.read_bytes(attribute_length);
-		attributes.push_back(AttributeInfo {
-			attribute_name_index,
-			std::move(info)
-		});
+		attributes.push_back(AttributeInfo::parse(reader));
 	}
 
 	LOG("ClassFile parsed successfully (offset: %lu)", reader.pos());

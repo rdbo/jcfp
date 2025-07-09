@@ -21,19 +21,13 @@
 #include <optional>
 #include "basetypes.hpp"
 #include "constant_pool.hpp"
+#include "attribute.hpp"
 #include "error.hpp"
 
 #define CLASSFILE_MAGIC 0xCAFEBABE
 #define RELOCATE_INDEX(index, diff, from) { if (index >= from) index += diff; }
 
 namespace jcfp {
-	typedef struct {
-		u2 attribute_name_index;
-		// u4 attribute_length;
-		// u1 info[attribute_length];
-		std::vector<u1> info;
-	} AttributeInfo;
-
 	typedef struct {
 		AccessFlags access_flags;
 		u2 name_index;
