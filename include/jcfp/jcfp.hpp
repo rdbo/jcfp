@@ -91,6 +91,7 @@ namespace jcfp {
 		static inline std::expected<ClassFile, Error> parse(const std::vector<u1> &bytes) { return parse(bytes.data(), bytes.size()); }
 		static inline std::expected<ClassFile, Error> parse(const u1 *bytes) { return parse(bytes, 0); }
 		std::vector<u1> encode();
+		void encode(ByteStream &stream);
 	public:
 		inline std::vector<std::string> get_attribute_names()
 		{

@@ -229,23 +229,31 @@ std::expected<ConstantPool, Error> ConstantPool::parse(const u1 *bytes, size_t m
 std::vector<u1>	ConstantPool::encode()
 {
 	ByteStream stream = ByteStream();
+	this->encode(stream);
+	return stream.collect();
+}
 
+void ConstantPool::encode(ByteStream &stream)
+{
 	u2 constant_pool_count = this->count();
 	stream.write_be(constant_pool_count);
 
 	for (auto &entry : this->entries) {
-		stream.write_bytes(entry.encode());
+		entry.encode(stream);
 	}
-
-	return stream.collect();        
 }
 
 std::vector<u1>	ConstantPoolEntry::encode()
 {
 	ByteStream stream = ByteStream();
+	this->encode(stream);
+	return stream.collect();
+}
 
+void ConstantPoolEntry::encode(ByteStream &stream)
+{
 	if (this->tag == Tag::Empty)
-		return stream.collect();
+		return;
 
 	stream.write_be(this->tag);
 
@@ -338,8 +346,6 @@ std::vector<u1>	ConstantPoolEntry::encode()
 		ERR("Failed to encode tag '%u' (unknown)", this->tag);
 		break;
 	}
-
-	return stream.collect();
 }
 
 void ConstantPool::relocate(int diff, u2 from)

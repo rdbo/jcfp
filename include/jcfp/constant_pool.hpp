@@ -200,6 +200,7 @@ namespace jcfp {
 		static std::expected<ConstantPoolEntry, Error> parse(const u1 *bytes, size_t max_length=0);
 		static inline std::expected<ConstantPoolEntry, Error> parse(const std::vector<u1> &bytes) { return parse(bytes.data(), bytes.size()); }
 		std::vector<u1> encode();
+		void encode(ByteStream &stream);
 		std::string to_string();
 
 		template <typename T>
@@ -227,6 +228,7 @@ namespace jcfp {
 		static std::expected<ConstantPool, Error> parse(const u1 *bytes, size_t max_length=0);
 		static inline std::expected<ConstantPool, Error> parse(const std::vector<u1> &bytes) { return parse(bytes.data(), bytes.size()); }
 		std::vector<u1> encode();
+		void encode(ByteStream &stream);
 	public:
 		/*
 		 * The constant pool entries are defined as:

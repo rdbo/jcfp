@@ -38,6 +38,7 @@ namespace jcfp {
 		static AttributeInfo parse(const u1 *bytes, size_t max_length=0);
 		static inline AttributeInfo parse(const std::vector<u1> &bytes) { return parse(bytes.data(), bytes.size()); }
 		std::vector<u1> encode();
+		void encode(ByteStream &stream);
 	};
 }
 

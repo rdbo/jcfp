@@ -114,10 +114,15 @@ std::expected<ClassFile, Error> ClassFile::parse(const u1 *bytes, size_t max_len
 			 fields, methods, attributes);
 }
 
-std::vector<u1>	ClassFile::encode()
+std::vector<u1> ClassFile::encode()
 {
 	ByteStream stream = ByteStream();
+	this->encode(stream);
+	return stream.collect();
+}
 
+void ClassFile::encode(ByteStream &stream)
+{
 	LOG("Encoding ClassFile to bytes...");
 
 	stream.write_be(this->magic);
@@ -125,9 +130,8 @@ std::vector<u1>	ClassFile::encode()
 	stream.write_be(this->major_version);
 
 	LOG("Encoding constant pool at offset: %lx", stream.size());
-	std::vector<u1> encoded_constant_pool = constant_pool.encode();
-	stream.write_bytes(encoded_constant_pool);
-	LOG("Encoded constant pool size: %lu", encoded_constant_pool.size());
+	constant_pool.encode(stream);
+	LOG("Current offset after writing constant pool: ", stream.size());
 
 	stream.write_be(this->access_flags);
 	stream.write_be(this->this_class);
@@ -151,7 +155,7 @@ std::vector<u1>	ClassFile::encode()
 		u2 attributes_count = static_cast<u2>(field.attributes.size());
 		stream.write_be(attributes_count);
 		for (auto &attribute : field.attributes) {
-			stream.write_bytes(attribute.encode());
+			attribute.encode(stream);
 		}
 	}
 
@@ -166,7 +170,7 @@ std::vector<u1>	ClassFile::encode()
 		u2 attributes_count = static_cast<u2>(method.attributes.size());
 		stream.write_be(attributes_count);
 		for (auto &attribute : method.attributes) {
-			stream.write_bytes(attribute.encode());
+			attribute.encode(stream);
 		}
 	}
 
@@ -174,10 +178,8 @@ std::vector<u1>	ClassFile::encode()
 	u2 attributes_count = static_cast<u2>(this->attributes.size());
 	stream.write_be(attributes_count);
 	for (auto &attribute : this->attributes) {
-		stream.write_bytes(attribute.encode());
+		attribute.encode(stream);
 	}
 
 	LOG("ClassFile encoding finished successfully");
-
-	return stream.collect();
 }
