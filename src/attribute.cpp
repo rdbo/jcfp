@@ -32,3 +32,16 @@ AttributeInfo AttributeInfo::parse(const u1 *bytes, size_t max_length)
 	BufReader reader = BufReader(bytes, max_length);
 	return AttributeInfo::parse(reader);
 }
+
+std::vector<u1> AttributeInfo::encode()
+{
+	ByteStream stream = ByteStream();
+
+	stream.write_be(this->attribute_name_index);
+
+	u4 attribute_length = this->info.size();
+	stream.write_be(attribute_length);
+	stream.write_bytes(this->info);
+
+	return stream.collect();
+}

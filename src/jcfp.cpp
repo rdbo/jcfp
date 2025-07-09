@@ -140,8 +140,6 @@ std::vector<u1>	ClassFile::encode()
 		stream.write_be(interface);
 	}
 
-	// TODO: Abstract attribute handling into a helper
-
 	LOG("Encoding fields at offset: %lx", stream.size());
 	u2 fields_count = static_cast<u2>(this->fields.size());
 	stream.write_be(fields_count);
@@ -153,11 +151,7 @@ std::vector<u1>	ClassFile::encode()
 		u2 attributes_count = static_cast<u2>(field.attributes.size());
 		stream.write_be(attributes_count);
 		for (auto &attribute : field.attributes) {
-			stream.write_be(attribute.attribute_name_index);
-
-			u4 attribute_length = attribute.info.size();
-			stream.write_be(attribute_length);
-			stream.write_bytes(attribute.info);
+			stream.write_bytes(attribute.encode());
 		}
 	}
 
@@ -172,11 +166,7 @@ std::vector<u1>	ClassFile::encode()
 		u2 attributes_count = static_cast<u2>(method.attributes.size());
 		stream.write_be(attributes_count);
 		for (auto &attribute : method.attributes) {
-			stream.write_be(attribute.attribute_name_index);
-
-			u4 attribute_length = attribute.info.size();
-			stream.write_be(attribute_length);
-			stream.write_bytes(attribute.info);
+			stream.write_bytes(attribute.encode());
 		}
 	}
 
@@ -184,11 +174,7 @@ std::vector<u1>	ClassFile::encode()
 	u2 attributes_count = static_cast<u2>(this->attributes.size());
 	stream.write_be(attributes_count);
 	for (auto &attribute : this->attributes) {
-		stream.write_be(attribute.attribute_name_index);
-
-		u4 attribute_length = attribute.info.size();
-		stream.write_be(attribute_length);
-		stream.write_bytes(attribute.info);
+		stream.write_bytes(attribute.encode());
 	}
 
 	LOG("ClassFile encoding finished successfully");
