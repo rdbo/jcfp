@@ -40,6 +40,29 @@ namespace jcfp {
 		std::vector<u1> encode();
 		void encode(ByteStream &stream);
 	};
+
+	class SourceFileAttr : public AttributeInfo {
+	public:
+		u2 sourcefile_index;
+	public:
+		SourceFileAttr(const AttributeInfo &attribute_info)
+			: AttributeInfo(attribute_info)
+		{
+			BufReader reader = BufReader(this->info.data(), this->info.size());
+			this->sourcefile_index = reader.read_be<u2>();
+		}
+
+		inline std::string get_source_file(ConstantPool &constant_pool)
+		{
+			return constant_pool.get<ConstantPoolEntry::Utf8Info>(this->sourcefile_index).bytes;
+		}
+
+		inline void set_source_file(ConstantPool &constant_pool, std::string source_file)
+		{
+			auto info = ConstantPoolEntry::Utf8Info { source_file };
+			constant_pool.replace_entry(this->sourcefile_index, info);
+		}
+	};
 }
 
 #endif
