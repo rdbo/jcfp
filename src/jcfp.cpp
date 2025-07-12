@@ -183,3 +183,12 @@ void ClassFile::encode(ByteStream &stream)
 
 	LOG("ClassFile encoding finished successfully");
 }
+
+void ClassFile::relocate(int diff, u2 from)
+{
+	this->constant_pool.relocate(diff, from);
+
+	for (auto &attr : this->attributes) {
+		attr.relocate(diff, from);
+	}
+}

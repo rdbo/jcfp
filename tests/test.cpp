@@ -96,9 +96,9 @@ int main()
 
         std::cout << "Constant pool relocation test" << std::endl;
         cf.constant_pool.insert_entry(2, entry);
-        cf.constant_pool.relocate(+1, 2);
+        cf.relocate(+1, 2);
         cf.constant_pool.remove_entry(2);
-        cf.constant_pool.relocate(-1, 2);
+        cf.relocate(-1, 2);
         encoded = cf.encode();
         verify = encoded == std::vector<u1>(buf, buf + size);
         std::cout << "CF Verify: " << (verify ? "OK" : "BAD") << std::endl;

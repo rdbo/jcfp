@@ -48,3 +48,9 @@ void AttributeInfo::encode(ByteStream &stream)
 	stream.write_be(attribute_length);
 	stream.write_bytes(this->info);
 }
+
+void AttributeInfo::relocate(int diff, u2 from)
+{
+	RELOCATE_INDEX(this->attribute_name_index, diff, from);
+	// TODO: Add attribute-specific relocations
+}

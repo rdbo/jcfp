@@ -39,6 +39,7 @@ namespace jcfp {
 		static inline AttributeInfo parse(const std::vector<u1> &bytes) { return parse(bytes.data(), bytes.size()); }
 		std::vector<u1> encode();
 		void encode(ByteStream &stream);
+		void relocate(int diff, u2 from);
 	};
 
 	class SourceFileAttr : public AttributeInfo {
