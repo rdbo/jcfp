@@ -260,11 +260,15 @@ namespace jcfp {
 			return entries[index].get<T>();
 		}
 
-		inline void push_entry(ConstantPoolEntry entry) {
+		inline u2 push_entry(ConstantPoolEntry entry) {
+			u2 next_index = entries.size();
+
 			entries.push_back(entry);
 			if (entry.is_wide_entry()) {
 				entries.push_back(ConstantPoolEntry());
 			}
+
+			return next_index;
 		}
 
 		inline ConstantPoolEntry pop_entry() {
@@ -294,6 +298,7 @@ namespace jcfp {
 		// WARN: If anyone is referencing the entry you removed,
 		//       you will get a bad relocation. Use 'replace_entry'
 		//       with the same entry type if you wanna avoid such issues.
+		//       Or relocate the classfile accordingly.
 		inline ConstantPoolEntry remove_entry(u2 index)
 		{
 			if (index > 1 && entries[index - 1].is_wide_entry())
@@ -314,19 +319,23 @@ namespace jcfp {
 		}
 
 
-		inline ConstantPoolEntry replace_entry(u2 index, ConstantPoolEntry entry)
+		// Returns the relocation needed to fix the classfile.
+		// If the previous entry is of the same type of the one
+		// replaced, there is no need for relocation.
+		inline int replace_entry(u2 index, ConstantPoolEntry entry)
 		{
+			int diff = 0;
 			auto old_entry = entries[index];
 			entries[index] = entry;
 			if (entry.is_wide_entry() && !old_entry.is_wide_entry()) {
 				this->insert_entry(index + 1, ConstantPoolEntry());
-				this->relocate(+1, index + 1);
+				++diff;
 			} else if (old_entry.is_wide_entry()) {
 				this->remove_entry(index + 1); // Remove empty pool entry
-				this->relocate(-1, index + 1);
+				--diff;
 			}
 
-			return old_entry;
+			return diff;
 		}
 
 		void relocate(int diff, u2 from);
