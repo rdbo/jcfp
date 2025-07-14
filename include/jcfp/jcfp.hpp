@@ -24,8 +24,8 @@
 #include "attribute.hpp"
 #include "error.hpp"
 
-#define CLASSFILE_MAGIC 0xCAFEBABE
-#define RELOCATE_INDEX(index, diff, from) { if (index >= from) index += diff; }
+#define JCFP_CLASSFILE_MAGIC 0xCAFEBABE
+#define JCFP_RELOCATE_INDEX(index, diff, from) { if (index >= from) index += diff; }
 
 namespace jcfp {
 	typedef struct {

@@ -367,52 +367,52 @@ void ConstantPoolEntry::relocate(int diff, u2 from)
 		break;
 	case Tag::Class: {
 		ClassInfo &info = this->get<ClassInfo>();
-		RELOCATE_INDEX(info.name_index, diff, from);
+		JCFP_RELOCATE_INDEX(info.name_index, diff, from);
 		break;
 	}
 	case Tag::Fieldref: {
 		FieldrefInfo &info = this->get<FieldrefInfo>();
-		RELOCATE_INDEX(info.class_index, diff, from);
-		RELOCATE_INDEX(info.name_and_type_index, diff, from);
+		JCFP_RELOCATE_INDEX(info.class_index, diff, from);
+		JCFP_RELOCATE_INDEX(info.name_and_type_index, diff, from);
 		break;
 	}
 	case Tag::Methodref: {
 		MethodrefInfo &info = this->get<MethodrefInfo>();
-		RELOCATE_INDEX(info.class_index, diff, from);
-		RELOCATE_INDEX(info.name_and_type_index, diff, from);
+		JCFP_RELOCATE_INDEX(info.class_index, diff, from);
+		JCFP_RELOCATE_INDEX(info.name_and_type_index, diff, from);
 		break;
 	}
 	case Tag::InterfaceMethodref: {
 		InterfaceMethodrefInfo &info = this->get<InterfaceMethodrefInfo>();
-		RELOCATE_INDEX(info.class_index, diff, from);
-		RELOCATE_INDEX(info.name_and_type_index, diff, from);
+		JCFP_RELOCATE_INDEX(info.class_index, diff, from);
+		JCFP_RELOCATE_INDEX(info.name_and_type_index, diff, from);
 		break;
 	}
 	case Tag::String: {
 		StringInfo &info = this->get<StringInfo>();
-		RELOCATE_INDEX(info.string_index, diff, from);
+		JCFP_RELOCATE_INDEX(info.string_index, diff, from);
 		break;
 	}
 	case Tag::NameAndType: {
 		NameAndTypeInfo &info = this->get<NameAndTypeInfo>();
-		RELOCATE_INDEX(info.name_index, diff, from);
-		RELOCATE_INDEX(info.descriptor_index, diff, from);
+		JCFP_RELOCATE_INDEX(info.name_index, diff, from);
+		JCFP_RELOCATE_INDEX(info.descriptor_index, diff, from);
 		break;
 	}
 	case Tag::MethodHandle: {
 		MethodHandleInfo &info = this->get<MethodHandleInfo>();
-		RELOCATE_INDEX(info.reference_index, diff, from);
+		JCFP_RELOCATE_INDEX(info.reference_index, diff, from);
 		break;
 	}
 	case Tag::MethodType: {
 		MethodTypeInfo &info = this->get<MethodTypeInfo>();
-		RELOCATE_INDEX(info.descriptor_index, diff, from);
+		JCFP_RELOCATE_INDEX(info.descriptor_index, diff, from);
 		break;
 	}
 	case Tag::InvokeDynamic: {
 		InvokeDynamicInfo &info = this->get<InvokeDynamicInfo>();
-		RELOCATE_INDEX(info.bootstrap_method_attr_index, diff, from);
-		RELOCATE_INDEX(info.name_and_type_index, diff, from);
+		JCFP_RELOCATE_INDEX(info.bootstrap_method_attr_index, diff, from);
+		JCFP_RELOCATE_INDEX(info.name_and_type_index, diff, from);
 		break;
 	}
 	default:

@@ -37,7 +37,7 @@ std::expected<ClassFile, Error> ClassFile::parse(const u1 *bytes, size_t max_len
 
 	magic = reader.read_be<u4>();
 	LOG("ClassFile magic: %X", magic);
-	if (magic != CLASSFILE_MAGIC)
+	if (magic != JCFP_CLASSFILE_MAGIC)
 		return std::unexpected(Error { ErrorKind::WrongMagic, reader.prev_pos() });
 
 	minor_version = reader.read_be<u2>();

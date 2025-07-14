@@ -51,6 +51,6 @@ void AttributeInfo::encode(ByteStream &stream)
 
 void AttributeInfo::relocate(int diff, u2 from)
 {
-	RELOCATE_INDEX(this->attribute_name_index, diff, from);
+	JCFP_RELOCATE_INDEX(this->attribute_name_index, diff, from);
 	// TODO: Add attribute-specific relocations
 }
